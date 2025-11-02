@@ -12,6 +12,25 @@ from .serializers import LoginSerializer, MeSerializer
 # 🔐 API VIEWS
 # ==============================================================
 
+@login_required
+def dean_dashboard(request):
+    return render(request, "dashboards/dean.html", {"user": request.user})
+
+@login_required
+def dean_courses(request):
+    headers = ["Code", "Title", "Description"]
+    return render(request, "dashboards/dean_courses.html", {"headers": headers, "user": request.user})
+
+@login_required
+def dean_subjects(request):
+    headers = ["Code", "Title", "Units", "Type", "Course"]
+    return render(request, "dashboards/dean_subjects.html", {"headers": headers, "user": request.user})
+
+@login_required
+def dean_sections(request):
+    headers = ["Code", "Course", "Term", "Professor", "Slots"]
+    return render(request, "dashboards/dean_sections.html", {"headers": headers, "user": request.user})
+
 class HybridLoginView(APIView):
     """
     Handles both JWT token generation and Django session login.
@@ -96,17 +115,18 @@ def dashboard(request):
 
 def logout_view(request):
     """
-    Logs out Django session and redirects to login page.
+    Logs out Django session + blacklists JWT (if provided).
     """
-    logout(request)  # clears Django session cookie
+    refresh_token = request.COOKIES.get("refresh") or request.POST.get("refresh")
+    if refresh_token:
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+        except Exception:
+            pass
+
+    logout(request)  # clears Django session
     response = redirect("/")
-    # Optional: explicitly delete cookies if any remain
-    response.delete_cookie("sessionid")
-    response.delete_cookie("csrftoken")
+    response.delete_cookie("access")
+    response.delete_cookie("refresh")
     return response
-    """
-    Logs out Django session (used by navbar Logout button).
-    JWT logout handled separately by /auth/logout API.
-    """
-    logout(request)
-    return redirect("/")

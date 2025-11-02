@@ -25,6 +25,10 @@ INSTALLED_APPS = [
     "archive",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    "terms",
+    "courses",
+    "subjects",
+    "sections",
 ]
 
 MIDDLEWARE = [
@@ -71,9 +75,9 @@ TIME_ZONE = "Asia/Manila"
 USE_I18N = True
 USE_TZ = True
 # Redirects for login_required decorator
-LOGIN_URL = '/'
-LOGIN_REDIRECT_URL = '/dashboard/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = "/"
+LOGIN_REDIRECT_URL = "/dashboard/"
+LOGOUT_REDIRECT_URL = "/"
 
 CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000"]
 
@@ -97,8 +101,8 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
