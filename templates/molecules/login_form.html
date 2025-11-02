@@ -1,0 +1,10 @@
+<form id="loginForm" method="POST" class="max-w-sm mx-auto bg-white shadow-lg p-6 rounded-2xl">
+  <h2 class="text-2xl font-bold mb-4 text-center text-indigo-700">Portal Login</h2>
+  {% include "atoms/alert.html" with message=error %}
+  {% csrf_token %}
+  {% include "atoms/input.html" with name="username" placeholder="Username" %}
+  <br />
+  {% include "atoms/input.html" with name="password" type="password" placeholder="Password" %}
+  <br />
+  {% include "atoms/button.html" %}{% block text %}Login{% endblock %}
+</form>
