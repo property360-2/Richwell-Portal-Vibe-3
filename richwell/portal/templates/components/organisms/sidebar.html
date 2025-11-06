@@ -38,24 +38,6 @@
   sidebar_content=content_html|default:""
 %}
 
-{# Width classes #}
-{% if sidebar_width == "sm" %}
-  {% with width_class="w-64" %}
-{% elif sidebar_width == "lg" %}
-  {% with width_class="w-96" %}
-{% elif sidebar_width == "xl" %}
-  {% with width_class="w-128" %}
-{% else %}
-  {% with width_class="w-80" %}
-{% endif %}
-
-{# Position classes #}
-{% if sidebar_position == "right" %}
-  {% with position_class="right-0" translate_closed="translate-x-full" translate_open="translate-x-0" %}
-{% else %}
-  {% with position_class="left-0" translate_closed="-translate-x-full" translate_open="translate-x-0" %}
-{% endif %}
-
 <div
   x-data="{
     open: false,
@@ -99,12 +81,12 @@
   <div
     x-show="open"
     x-transition:enter="transform transition ease-in-out duration-300"
-    x-transition:enter-start="{{ translate_closed }}"
-    x-transition:enter-end="{{ translate_open }}"
+    x-transition:enter-start="{% if sidebar_position == 'right' %}translate-x-full{% else %}-translate-x-full{% endif %}"
+    x-transition:enter-end="translate-x-0"
     x-transition:leave="transform transition ease-in-out duration-300"
-    x-transition:leave-start="{{ translate_open }}"
-    x-transition:leave-end="{{ translate_closed }}"
-    class="fixed {{ position_class }} top-0 bottom-0 {{ width_class }} z-50 bg-white shadow-xl overflow-y-auto"
+    x-transition:leave-start="translate-x-0"
+    x-transition:leave-end="{% if sidebar_position == 'right' %}translate-x-full{% else %}-translate-x-full{% endif %}"
+    class="fixed {% if sidebar_position == 'right' %}right-0{% else %}left-0{% endif %} top-0 bottom-0 {% if sidebar_width == 'sm' %}w-64{% elif sidebar_width == 'lg' %}w-96{% elif sidebar_width == 'xl' %}w-128{% else %}w-80{% endif %} z-50 bg-white shadow-xl overflow-y-auto"
     role="dialog"
     aria-modal="true"
     aria-labelledby="sidebar-{{ sidebar_id }}-title"
@@ -187,6 +169,4 @@
   </div>
 </div>
 
-{% endwith %}
-{% endwith %}
 {% endwith %}

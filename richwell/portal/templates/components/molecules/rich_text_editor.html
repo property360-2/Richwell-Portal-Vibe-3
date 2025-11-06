@@ -47,14 +47,6 @@
   editor_toolbar_items=toolbar_items|default:"bold,italic,underline,h2,h3,ul,ol,link"
 %}
 
-{# Height classes #}
-{% if editor_min_height == "sm" %}
-  {% with height_class="min-h-[150px]" %}
-{% elif editor_min_height == "lg" %}
-  {% with height_class="min-h-[400px]" %}
-{% else %}
-  {% with height_class="min-h-[250px]" %}
-{% endif %}
 
 <div
   class="w-full"
@@ -302,7 +294,7 @@
     @focus="focused = true"
     @blur="focused = false"
     :placeholder="content ? '' : '{{ editor_placeholder }}'"
-    class="block w-full px-4 py-3 border {{ height_class }} overflow-y-auto focus:outline-none focus:ring-2 focus:ring-blue-500 transition
+    class="block w-full px-4 py-3 border {% if editor_min_height == 'sm' %}min-h-[150px]{% elif editor_min_height == 'lg' %}min-h-[400px]{% else %}min-h-[250px]{% endif %} overflow-y-auto focus:outline-none focus:ring-2 focus:ring-blue-500 transition
       {% if editor_toolbar %}border-t-0 rounded-b-lg{% else %}rounded-lg{% endif %}
       {% if editor_error %}border-red-300{% else %}border-gray-300{% endif %}
       {% if editor_disabled %}bg-gray-100 cursor-not-allowed text-gray-500{% else %}bg-white{% endif %}"
@@ -416,5 +408,4 @@
   }
 </style>
 
-{% endwith %}
 {% endwith %}

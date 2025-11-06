@@ -76,7 +76,7 @@ class EnrollmentServiceTests(TestCase):
             units=3,
             type='major',
             recommended_year=1,
-            recommended_semester=1
+            recommended_sem=1
         )
 
         self.subject2 = Subject.objects.create(
@@ -86,7 +86,7 @@ class EnrollmentServiceTests(TestCase):
             units=3,
             type='major',
             recommended_year=1,
-            recommended_semester=2
+            recommended_sem=2
         )
 
         # Create prerequisite
@@ -203,7 +203,7 @@ class GradeServiceTests(TestCase):
             units=3,
             type='major',
             recommended_year=1,
-            recommended_semester=1
+            recommended_sem=1
         )
 
         # Create section
@@ -347,7 +347,7 @@ class SectionServiceTests(TestCase):
             units=3,
             type='major',
             recommended_year=1,
-            recommended_semester=1
+            recommended_sem=1
         )
 
         # Create section
