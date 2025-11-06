@@ -16,11 +16,159 @@
 
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen" x-data="{ showMobileSidebar: false }">
 
     {% if user.is_authenticated %}
-    <!-- Navigation - Using Organism Component -->
-    {% include 'components/organisms/navbar.html' with user=user %}
+    <!-- Enhanced Navigation with Mobile Menu Button -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Brand and Mobile Menu -->
+                <div class="flex items-center space-x-4">
+                    <!-- Mobile Menu Button -->
+                    <button
+                        @click="showMobileSidebar = true"
+                        class="lg:hidden p-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white"
+                        aria-label="Open menu"
+                    >
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <h1 class="text-2xl font-bold">Richwell School Portal</h1>
+                </div>
+
+                <!-- User Section -->
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm hidden sm:inline">
+                        Welcome, <strong>{{ user.get_full_name|default:user.username }}</strong>
+                        {% if user.role %}
+                        {% include 'components/atoms/badge.html' with text=user.role variant='primary' size='sm' %}
+                        {% endif %}
+                    </span>
+                    {% include 'components/atoms/button.html' with text='Logout' href='logout' variant='secondary' size='sm' %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Sidebar Navigation -->
+    <div
+        x-show="showMobileSidebar"
+        @keydown.escape.window="showMobileSidebar = false"
+        style="display: none;"
+        x-cloak
+    >
+        <!-- Backdrop -->
+        <div
+            x-show="showMobileSidebar"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            @click="showMobileSidebar = false"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 z-40"
+            aria-hidden="true"
+        ></div>
+
+        <!-- Sidebar Panel -->
+        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl">
+            <div
+                x-show="showMobileSidebar"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="-translate-x-full"
+                x-transition:enter-end="translate-x-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="translate-x-0"
+                x-transition:leave-end="-translate-x-full"
+                class="h-full flex flex-col"
+            >
+                <!-- Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-blue-600 text-white">
+                    <h2 class="text-lg font-semibold">Navigation Menu</h2>
+                    <button
+                        @click="showMobileSidebar = false"
+                        class="p-1 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white"
+                        aria-label="Close menu"
+                    >
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="flex-1 overflow-y-auto p-4">
+                    <div class="space-y-2">
+                        <!-- Dashboard Link -->
+                        <a href="{% url 'student_dashboard' %}" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            Dashboard
+                        </a>
+
+                        <!-- Enrollment Link -->
+                        <a href="{% url 'enrollment' %}" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            Enrollment
+                        </a>
+
+                        <!-- Profile Link -->
+                        <a href="{% url 'student_profile' %}" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Profile
+                        </a>
+
+                        <!-- Grades Link -->
+                        <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Grades
+                        </a>
+
+                        <!-- Divider -->
+                        <hr class="my-4 border-gray-200" />
+
+                        <!-- Settings -->
+                        <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Settings
+                        </a>
+                    </div>
+                </nav>
+
+                <!-- Footer with User Info -->
+                <div class="p-4 border-t border-gray-200 bg-gray-50">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                            <div class="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
+                                {{ user.get_full_name|default:user.username|first|upper }}
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">
+                                {{ user.get_full_name|default:user.username }}
+                            </p>
+                            {% if user.role %}
+                            <p class="text-xs text-gray-500 truncate">{{ user.role }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     {% endif %}
 
     <!-- Messages - Using Molecule Component -->
