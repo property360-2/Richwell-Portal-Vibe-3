@@ -100,7 +100,7 @@ class ModelTests(TestCase):
             lab_hours=0,
             type='major',
             recommended_year=1,
-            recommended_semester=1
+            recommended_sem=1
         )
 
         # Create section
@@ -303,7 +303,7 @@ class FormTests(TestCase):
             units=3,
             type='major',
             recommended_year=1,
-            recommended_semester=1
+            recommended_sem=1
         )
 
         self.professor = User.objects.create_user(
@@ -390,7 +390,7 @@ class IntegrationTests(TestCase):
             units=3,
             type='major',
             recommended_year=1,
-            recommended_semester=1
+            recommended_sem=1
         )
 
         self.section = Section.objects.create(
@@ -500,7 +500,7 @@ class ServiceTests(TestCase):
             units=3,
             type='major',
             recommended_year=1,
-            recommended_semester=1
+            recommended_sem=1
         )
 
         self.subject2 = Subject.objects.create(
@@ -510,13 +510,13 @@ class ServiceTests(TestCase):
             units=3,
             type='major',
             recommended_year=1,
-            recommended_semester=2
+            recommended_sem=2
         )
 
         # Create prerequisite
         self.prerequisite = Prerequisite.objects.create(
             subject=self.subject2,
-            prerequisite_subject=self.subject1
+            prereq_subject=self.subject1
         )
 
         # Create sections
@@ -582,7 +582,7 @@ class ServiceTests(TestCase):
                 units=3,
                 type='major',
                 recommended_year=2,
-                recommended_semester=1
+                recommended_sem=1
             )
             section = Section.objects.create(
                 subject=subject,
@@ -609,7 +609,7 @@ class ServiceTests(TestCase):
             units=3,
             type='major',
             recommended_year=2,
-            recommended_semester=2
+            recommended_sem=2
         )
         new_section = Section.objects.create(
             subject=new_subject,

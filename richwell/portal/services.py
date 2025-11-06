@@ -247,6 +247,13 @@ class GradeService:
         student_subject.save()
 
     @staticmethod
+    def is_passing(grade_value: float) -> bool:
+        """
+        Check if a numeric grade is passing (3.0 or below)
+        """
+        return grade_value <= 3.0
+
+    @staticmethod
     def calculate_gpa(student: Student) -> Optional[Decimal]:
         """
         Calculate student's GPA based on all completed subjects
@@ -320,10 +327,17 @@ class TermService:
 
     @staticmethod
     @transaction.atomic
-    def activate_term(term: Term, actor=None) -> None:
+    def activate_term(term, actor=None) -> None:
         """
         Activate a term (deactivates all others)
+        Args:
+            term: Term object or term ID
+            actor: User performing the action (optional)
         """
+        # Handle both Term object and ID
+        if isinstance(term, int):
+            term = Term.objects.get(id=term)
+
         # Deactivate all other terms
         Term.objects.exclude(id=term.id).update(is_active=False)
 
@@ -445,6 +459,14 @@ class SettingsService:
         Get a setting value
         """
         return Setting.get_value(key, default)
+
+    @staticmethod
+    def is_enrollment_open() -> bool:
+        """
+        Check if enrollment is currently open
+        """
+        value = SettingsService.get_setting('enrollment_open', 'false')
+        return value.lower() == 'true'
 
     @staticmethod
     @transaction.atomic
