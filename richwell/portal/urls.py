@@ -81,4 +81,15 @@ urlpatterns = [
 
     # INC grade tracking (Dean/Registrar)
     path('reports/inc-tracking/', views.inc_grade_tracking, name='inc_grade_tracking'),
+
+    # Export functionality
+    path('export/cor/pdf/', views.export_cor_pdf, name='export_cor_pdf'),
+    path('export/section/<int:section_id>/roster/pdf/', views.export_section_roster_pdf, name='export_section_roster_pdf'),
+    path('export/section/<int:section_id>/grades/csv/', views.export_section_grades_csv, name='export_section_grades_csv'),
+    path('export/section/<int:section_id>/grades/excel/', views.export_section_grades_excel, name='export_section_grades_excel'),
+    path('export/enrollment/report/csv/', views.export_enrollment_report_csv, name='export_enrollment_report_csv'),
+
+    # Password management
+    path('change-password/', views.change_password, name='change_password'),
+    path('admin/reset-password/<int:user_id>/', views.reset_user_password, name='reset_user_password'),
 ]
