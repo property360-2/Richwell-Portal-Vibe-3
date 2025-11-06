@@ -1,0 +1,62 @@
+{# Checkbox Atom Component
+
+   Props:
+   - name: Field name (required)
+   - id: Checkbox ID (defaults to name)
+   - value: Checkbox value (defaults to "on")
+   - checked: Whether checkbox is checked (boolean)
+   - label: Label text for the checkbox
+   - disabled: Whether checkbox is disabled (boolean)
+   - required: Whether field is required (boolean)
+   - help_text: Help text to display below checkbox
+   - description: Description text next to label
+
+   Usage:
+   {% include 'components/atoms/checkbox.html'
+       with name='agree_terms'
+       label='I agree to the terms and conditions'
+       required=True %}
+#}
+
+{% with
+    checkbox_id=id|default:name
+    checkbox_value=value|default:"on"
+    checkbox_checked=checked|default:False
+    checkbox_disabled=disabled|default:False
+    checkbox_required=required|default:False
+%}
+
+<div class="flex items-start">
+    <div class="flex items-center h-5">
+        <input
+            type="checkbox"
+            name="{{ name }}"
+            id="{{ checkbox_id }}"
+            value="{{ checkbox_value }}"
+            {% if checkbox_checked %}checked{% endif %}
+            {% if checkbox_disabled %}disabled{% endif %}
+            {% if checkbox_required %}required{% endif %}
+            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2
+                   {% if checkbox_disabled %}opacity-50 cursor-not-allowed{% else %}cursor-pointer{% endif %}"
+        >
+    </div>
+
+    {% if label %}
+    <div class="ml-3 text-sm">
+        <label for="{{ checkbox_id }}" class="font-medium text-gray-700 {% if checkbox_disabled %}opacity-50 cursor-not-allowed{% else %}cursor-pointer{% endif %}">
+            {{ label }}
+            {% if checkbox_required %}<span class="text-red-600">*</span>{% endif %}
+        </label>
+
+        {% if description %}
+        <p class="text-gray-500 mt-1">{{ description }}</p>
+        {% endif %}
+
+        {% if help_text %}
+        <p class="text-gray-500 text-xs mt-1">{{ help_text }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% endwith %}

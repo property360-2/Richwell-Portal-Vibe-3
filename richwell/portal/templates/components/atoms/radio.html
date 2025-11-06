@@ -1,0 +1,63 @@
+{# Radio Atom Component
+
+   Props:
+   - name: Field name (required) - must be same for all radios in group
+   - id: Radio button ID (required, must be unique)
+   - value: Radio button value (required)
+   - checked: Whether radio is checked (boolean)
+   - label: Label text for the radio button
+   - disabled: Whether radio is disabled (boolean)
+   - required: Whether field is required (boolean)
+   - description: Description text below label
+
+   Usage:
+   {% include 'components/atoms/radio.html'
+       with name='payment_method'
+       id='payment_card'
+       value='card'
+       label='Credit Card'
+       checked=True %}
+
+   {% include 'components/atoms/radio.html'
+       with name='payment_method'
+       id='payment_cash'
+       value='cash'
+       label='Cash' %}
+#}
+
+{% with
+    radio_checked=checked|default:False
+    radio_disabled=disabled|default:False
+    radio_required=required|default:False
+%}
+
+<div class="flex items-start">
+    <div class="flex items-center h-5">
+        <input
+            type="radio"
+            name="{{ name }}"
+            id="{{ id }}"
+            value="{{ value }}"
+            {% if radio_checked %}checked{% endif %}
+            {% if radio_disabled %}disabled{% endif %}
+            {% if radio_required %}required{% endif %}
+            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2
+                   {% if radio_disabled %}opacity-50 cursor-not-allowed{% else %}cursor-pointer{% endif %}"
+        >
+    </div>
+
+    {% if label %}
+    <div class="ml-3 text-sm">
+        <label for="{{ id }}" class="font-medium text-gray-700 {% if radio_disabled %}opacity-50 cursor-not-allowed{% else %}cursor-pointer{% endif %}">
+            {{ label }}
+            {% if radio_required %}<span class="text-red-600">*</span>{% endif %}
+        </label>
+
+        {% if description %}
+        <p class="text-gray-500 mt-1">{{ description }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% endwith %}
