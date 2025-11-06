@@ -6,32 +6,25 @@
 <div class="space-y-6">
 
     {# Page Header #}
-    {% include 'components/organisms/page_header.html'
-        with title='Professor Dashboard'
-        subtitle='Welcome, '|add:user.get_full_name|add:'!' %}
+    {% with subtitle_text='Welcome, '|add:user.get_full_name|add:'!' %}
+        {% include 'components/organisms/page_header.html' with title='Professor Dashboard' subtitle=subtitle_text %}
+    {% endwith %}
 
     {# Quick Stats #}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {% include 'components/molecules/stat_card.html'
-            with label='Active Sections'
-            value=sections|length
-            icon='📚' %}
+        {% include 'components/molecules/stat_card.html' with label='Active Sections' value=sections|length icon='📚' %}
 
-        {% include 'components/molecules/stat_card.html'
-            with label='Total Students'
-            value=total_students|default:'0'
-            icon='👥' %}
+        {% include 'components/molecules/stat_card.html' with label='Total Students' value=total_students|default:'0' icon='👥' %}
 
-        {% include 'components/molecules/stat_card.html'
-            with label='All Time Sections'
-            value=all_sections|length
-            icon='📊' %}
+        {% include 'components/molecules/stat_card.html' with label='All Time Sections' value=all_sections|length icon='📊' %}
     </div>
 
     {# Current Term Sections #}
-    {% include 'components/molecules/card.html'
-        with title='Current Sections'|add:' - '|add:active_term.name|default_if_none:'Current Sections'
-        shadow='md' %}
+    {% if active_term %}
+        {% include 'components/molecules/card.html' with title='Current Sections' shadow='md' %}
+    {% else %}
+        {% include 'components/molecules/card.html' with title='Current Sections' shadow='md' %}
+    {% endif %}
 
     <div class="bg-white rounded-lg shadow-md p-6 -mt-6">
         {% if sections %}
@@ -60,16 +53,10 @@
                 </div>
 
                 <div class="flex space-x-2">
-                    {% include 'components/atoms/button.html'
-                        with text='View Students'
-                        href='/section/'|add:section.id|stringformat:"s"|add:'/students/'
-                        type='primary'
-                        size='sm' %}
-                    {% include 'components/atoms/button.html'
-                        with text='Manage Grades'
-                        href='/section/'|add:section.id|stringformat:"s"|add:'/students/'
-                        type='success'
-                        size='sm' %}
+                    {% with button_href='/section/'|add:section.id|stringformat:"s"|add:'/students/' %}
+                        {% include 'components/atoms/button.html' with text='View Students' href=button_href type='primary' size='sm' %}
+                        {% include 'components/atoms/button.html' with text='Manage Grades' href=button_href type='success' size='sm' %}
+                    {% endwith %}
                 </div>
             </div>
             {% endfor %}

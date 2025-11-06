@@ -63,14 +63,14 @@ class ModelTests(TestCase):
         self.program = Program.objects.create(
             code='BSCS',
             name='Bachelor of Science in Computer Science',
-            level='undergraduate',
+            level='Bachelor',
             passing_grade=3.0
         )
 
         self.curriculum = Curriculum.objects.create(
             program=self.program,
             version='2024',
-            effective_date=date(2024, 1, 1)
+            effective_sy='AY 2024-2025'
         )
 
         # Create student
@@ -78,7 +78,6 @@ class ModelTests(TestCase):
             user=self.student_user,
             program=self.program,
             curriculum=self.curriculum,
-            year_level=1,
             status='active'
         )
 
@@ -93,11 +92,15 @@ class ModelTests(TestCase):
 
         # Create subject
         self.subject = Subject.objects.create(
+            program=self.program,
             code='CS101',
             title='Introduction to Programming',
             units=3,
             lecture_hours=3,
-            lab_hours=0
+            lab_hours=0,
+            type='major',
+            recommended_year=1,
+            recommended_semester=1
         )
 
         # Create section
@@ -127,8 +130,20 @@ class ModelTests(TestCase):
 
     def test_student_is_freshman(self):
         """Test student is_freshman method."""
+        # Should be freshman if no completed subjects
         self.assertTrue(self.student.is_freshman())
-        self.student.year_level = 2
+
+        # Create a completed enrollment
+        enrollment = StudentSubject.objects.create(
+            student=self.student,
+            subject=self.subject,
+            section=self.section,
+            term=self.term,
+            professor=self.professor_user,
+            status='completed'
+        )
+
+        # Should not be freshman anymore
         self.assertFalse(self.student.is_freshman())
 
     def test_term_is_enrollment_open(self):
@@ -151,6 +166,7 @@ class ModelTests(TestCase):
             subject=self.subject,
             section=self.section,
             term=self.term,
+            professor=self.professor_user,
             status='enrolled'
         )
 
@@ -163,6 +179,7 @@ class ModelTests(TestCase):
             subject=self.subject,
             section=self.section,
             term=self.term,
+            professor=self.professor_user,
             status='enrolled'
         )
 
@@ -256,19 +273,20 @@ class FormTests(TestCase):
 
         self.program = Program.objects.create(
             code='BSCS',
-            name='Bachelor of Science in Computer Science'
+            name='Bachelor of Science in Computer Science',
+            level='Bachelor'
         )
 
         self.curriculum = Curriculum.objects.create(
             program=self.program,
-            version='2024'
+            version='2024',
+            effective_sy='AY 2024-2025'
         )
 
         self.student = Student.objects.create(
             user=self.student_user,
             program=self.program,
-            curriculum=self.curriculum,
-            year_level=1
+            curriculum=self.curriculum
         )
 
         self.term = Term.objects.create(
@@ -279,9 +297,13 @@ class FormTests(TestCase):
         )
 
         self.subject = Subject.objects.create(
+            program=self.program,
             code='CS101',
             title='Introduction to Programming',
-            units=3
+            units=3,
+            type='major',
+            recommended_year=1,
+            recommended_semester=1
         )
 
         self.professor = User.objects.create_user(
@@ -336,19 +358,20 @@ class IntegrationTests(TestCase):
         # Create program structure
         self.program = Program.objects.create(
             code='BSCS',
-            name='Bachelor of Science in Computer Science'
+            name='Bachelor of Science in Computer Science',
+            level='Bachelor'
         )
 
         self.curriculum = Curriculum.objects.create(
             program=self.program,
-            version='2024'
+            version='2024',
+            effective_sy='AY 2024-2025'
         )
 
         self.student = Student.objects.create(
             user=self.student_user,
             program=self.program,
-            curriculum=self.curriculum,
-            year_level=1
+            curriculum=self.curriculum
         )
 
         # Create term and courses
@@ -361,9 +384,13 @@ class IntegrationTests(TestCase):
         )
 
         self.subject = Subject.objects.create(
+            program=self.program,
             code='CS101',
             title='Introduction to Programming',
-            units=3
+            units=3,
+            type='major',
+            recommended_year=1,
+            recommended_semester=1
         )
 
         self.section = Section.objects.create(
@@ -398,6 +425,7 @@ class IntegrationTests(TestCase):
             subject=self.subject,
             section=self.section,
             term=self.term,
+            professor=self.professor_user,
             status='enrolled'
         )
 
@@ -452,8 +480,7 @@ class ServiceTests(TestCase):
         self.student = Student.objects.create(
             user=self.student_user,
             program=self.program,
-            curriculum=self.curriculum,
-            year_level=1
+            curriculum=self.curriculum
         )
 
         # Create term
@@ -467,15 +494,23 @@ class ServiceTests(TestCase):
 
         # Create subjects
         self.subject1 = Subject.objects.create(
+            program=self.program,
             code='CS101',
             title='Programming 1',
-            units=3
+            units=3,
+            type='major',
+            recommended_year=1,
+            recommended_semester=1
         )
 
         self.subject2 = Subject.objects.create(
+            program=self.program,
             code='CS102',
             title='Data Structures',
-            units=3
+            units=3,
+            type='major',
+            recommended_year=1,
+            recommended_semester=2
         )
 
         # Create prerequisite
@@ -504,9 +539,9 @@ class ServiceTests(TestCase):
         )
 
         # Create system settings
-        Setting.objects.create(key='enrollment_open', value='true')
-        Setting.objects.create(key='freshman_unit_cap', value='30')
-        Setting.objects.create(key='passing_grade', value='3.0')
+        Setting.objects.create(key_name='enrollment_open', value_text='true')
+        Setting.objects.create(key_name='freshman_unit_cap', value_text='30')
+        Setting.objects.create(key_name='passing_grade', value_text='3.0')
 
     def test_enrollment_service_validate_enrollment(self):
         """Test enrollment validation in EnrollmentService."""
@@ -534,15 +569,20 @@ class ServiceTests(TestCase):
             subject=self.subject1,
             section=self.section1,
             term=self.term,
+            professor=self.professor_user,
             status='enrolled'
         )
 
         # Create many 3-unit subjects to exceed cap
         for i in range(10):
             subject = Subject.objects.create(
+                program=self.program,
                 code=f'CS20{i}',
                 title=f'Test Subject {i}',
-                units=3
+                units=3,
+                type='major',
+                recommended_year=2,
+                recommended_semester=1
             )
             section = Section.objects.create(
                 subject=subject,
@@ -557,14 +597,19 @@ class ServiceTests(TestCase):
                 subject=subject,
                 section=section,
                 term=self.term,
+                professor=self.professor_user,
                 status='enrolled'
             )
 
         # Total units should exceed 30, validation should fail
         new_subject = Subject.objects.create(
+            program=self.program,
             code='CS999',
             title='Overflow Subject',
-            units=3
+            units=3,
+            type='major',
+            recommended_year=2,
+            recommended_semester=2
         )
         new_section = Section.objects.create(
             subject=new_subject,
@@ -589,6 +634,7 @@ class ServiceTests(TestCase):
             subject=self.subject1,
             section=self.section1,
             term=self.term,
+            professor=self.professor_user,
             status='completed'
         )
 
@@ -654,6 +700,7 @@ class ServiceTests(TestCase):
             subject=self.subject1,
             section=self.section1,
             term=self.term,
+            professor=self.professor_user,
             status='enrolled'
         )
 
@@ -674,8 +721,8 @@ class ServiceTests(TestCase):
         self.assertTrue(SettingsService.is_enrollment_open())
 
         # Change setting
-        setting = Setting.objects.get(key='enrollment_open')
-        setting.value = 'false'
+        setting = Setting.objects.get(key_name='enrollment_open')
+        setting.value_text = 'false'
         setting.save()
 
         self.assertFalse(SettingsService.is_enrollment_open())
@@ -712,13 +759,20 @@ class DecoratorTests(TestCase):
         self.client.login(username='student', password='test123')
 
         # Create student record for the user
-        program = Program.objects.create(code='BSCS', name='Computer Science')
-        curriculum = Curriculum.objects.create(program=program, version='2024')
+        program = Program.objects.create(
+            code='BSCS',
+            name='Computer Science',
+            level='Bachelor'
+        )
+        curriculum = Curriculum.objects.create(
+            program=program,
+            version='2024',
+            effective_sy='AY 2024-2025'
+        )
         Student.objects.create(
             user=self.student_user,
             program=program,
-            curriculum=curriculum,
-            year_level=1
+            curriculum=curriculum
         )
 
         response = self.client.get(reverse('student_dashboard'))

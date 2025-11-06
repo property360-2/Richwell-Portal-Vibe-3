@@ -56,8 +56,7 @@ class EnrollmentServiceTests(TestCase):
         self.student = Student.objects.create(
             user=self.student_user,
             program=self.program,
-            curriculum=self.curriculum,
-            year_level=1
+            curriculum=self.curriculum
         )
 
         # Create term
@@ -116,8 +115,8 @@ class EnrollmentServiceTests(TestCase):
         )
 
         # Create settings
-        Setting.objects.create(key='enrollment_open', value='true')
-        Setting.objects.create(key='freshman_unit_cap', value='30')
+        Setting.objects.create(key_name='enrollment_open', value_text='true')
+        Setting.objects.create(key_name='freshman_unit_cap', value_text='30')
         Setting.objects.create(key='passing_grade', value='3.0')
 
     def test_validate_enrollment_success(self):
@@ -185,8 +184,7 @@ class GradeServiceTests(TestCase):
         self.student = Student.objects.create(
             user=self.student_user,
             program=self.program,
-            curriculum=self.curriculum,
-            year_level=1
+            curriculum=self.curriculum
         )
 
         # Create term
@@ -279,7 +277,7 @@ class TermServiceTests(TestCase):
             name='2nd Semester 2024-2025',
             start_date=date(2025, 1, 1),
             end_date=date(2025, 5, 15),
-            active=False
+            is_active=False
         )
 
         # Activate the second term
@@ -390,8 +388,8 @@ class SettingsServiceTests(TestCase):
 
     def setUp(self):
         """Set up test data."""
-        Setting.objects.create(key='enrollment_open', value='true')
-        Setting.objects.create(key='freshman_unit_cap', value='30')
+        Setting.objects.create(key_name='enrollment_open', value_text='true')
+        Setting.objects.create(key_name='freshman_unit_cap', value_text='30')
 
     def test_get_setting_existing(self):
         """Test retrieving existing setting."""
@@ -409,8 +407,8 @@ class SettingsServiceTests(TestCase):
 
     def test_is_enrollment_open_false(self):
         """Test enrollment open check when false."""
-        setting = Setting.objects.get(key='enrollment_open')
-        setting.value = 'false'
+        setting = Setting.objects.get(key_name='enrollment_open')
+        setting.value_text = 'false'
         setting.save()
 
         self.assertFalse(SettingsService.is_enrollment_open())
