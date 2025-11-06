@@ -1,0 +1,308 @@
+{# Wizard Organism - Multi-step guided workflow #}
+{#
+  Props:
+  - id: unique identifier for the wizard (required)
+  - steps: list of step objects with 'title', 'description', 'icon' (optional)
+  - show_progress: show progress bar (default: True)
+  - show_step_numbers: show step numbers in navigation (default: True)
+  - allow_skip: allow skipping steps (default: False)
+  - linear: must complete steps in order (default: True)
+
+  Usage:
+  {% include "components/organisms/wizard.html" with
+    id="enrollmentWizard"
+    steps=wizard_steps
+    show_progress=True
+  %}
+
+  Steps format:
+  steps = [
+    {'title': 'Personal Info', 'description': 'Enter your details', 'icon': 'user'},
+    {'title': 'Documents', 'description': 'Upload files', 'icon': 'document'},
+    {'title': 'Review', 'description': 'Confirm submission', 'icon': 'check'},
+  ]
+
+  Alpine.js controls:
+  - currentStep: current step index (0-based)
+  - nextStep(): go to next step
+  - prevStep(): go to previous step
+  - goToStep(index): jump to specific step
+  - isStepComplete(index): check if step is complete
+#}
+
+{% load static %}
+
+{# Set defaults #}
+{% with
+  wizard_id=id|default:"wizard"
+  wizard_steps=steps|default:list
+  wizard_show_progress=show_progress|default:True
+  wizard_show_numbers=show_step_numbers|default:True
+  wizard_allow_skip=allow_skip|default:False
+  wizard_linear=linear|default:True
+%}
+
+<div
+  x-data="{
+    currentStep: 0,
+    completedSteps: [],
+    totalSteps: {{ wizard_steps|length|default:3 }},
+
+    nextStep() {
+      if (this.currentStep < this.totalSteps - 1) {
+        this.markStepComplete(this.currentStep);
+        this.currentStep++;
+      }
+    },
+
+    prevStep() {
+      if (this.currentStep > 0) {
+        this.currentStep--;
+      }
+    },
+
+    goToStep(step) {
+      {% if wizard_linear %}
+      // In linear mode, can only go to completed steps or next step
+      if (step <= this.currentStep || this.isStepComplete(step - 1)) {
+        this.currentStep = step;
+      }
+      {% else %}
+      // In non-linear mode, can jump to any step
+      this.currentStep = step;
+      {% endif %}
+    },
+
+    markStepComplete(step) {
+      if (!this.completedSteps.includes(step)) {
+        this.completedSteps.push(step);
+      }
+    },
+
+    isStepComplete(step) {
+      return this.completedSteps.includes(step);
+    },
+
+    isStepAccessible(step) {
+      {% if wizard_linear %}
+      return step === 0 || this.isStepComplete(step - 1);
+      {% else %}
+      return true;
+      {% endif %}
+    },
+
+    getStepStatus(step) {
+      if (step === this.currentStep) return 'current';
+      if (this.isStepComplete(step)) return 'complete';
+      if (this.isStepAccessible(step)) return 'upcoming';
+      return 'locked';
+    },
+
+    getProgressPercentage() {
+      return (this.currentStep / (this.totalSteps - 1)) * 100;
+    }
+  }"
+  id="wizard-{{ wizard_id }}"
+  class="w-full"
+>
+  <!-- Progress Bar -->
+  {% if wizard_show_progress %}
+  <div class="mb-8">
+    <div class="relative">
+      <!-- Background track -->
+      <div class="overflow-hidden h-2 text-xs flex rounded-full bg-gray-200">
+        <!-- Progress fill -->
+        <div
+          :style="'width: ' + getProgressPercentage() + '%'"
+          class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-600 transition-all duration-500 ease-out"
+        ></div>
+      </div>
+      <!-- Progress text -->
+      <div class="flex justify-between text-xs text-gray-600 mt-2">
+        <span>Step <span x-text="currentStep + 1"></span> of <span x-text="totalSteps"></span></span>
+        <span x-text="Math.round(getProgressPercentage()) + '% Complete'"></span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Step Navigation -->
+  <nav aria-label="Progress" class="mb-8">
+    <ol role="list" class="flex items-center justify-between">
+      {% for step in wizard_steps %}
+      <li class="relative flex-1 {% if not forloop.last %}pr-8 sm:pr-20{% endif %}">
+        <!-- Step button -->
+        <button
+          type="button"
+          @click="goToStep({{ forloop.counter0 }})"
+          :disabled="!isStepAccessible({{ forloop.counter0 }})"
+          class="group w-full focus:outline-none"
+          :class="{
+            'cursor-pointer': isStepAccessible({{ forloop.counter0 }}),
+            'cursor-not-allowed opacity-50': !isStepAccessible({{ forloop.counter0 }})
+          }"
+        >
+          <div class="flex items-center">
+            <!-- Step circle/icon -->
+            <div
+              class="relative flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors"
+              :class="{
+                'border-blue-600 bg-blue-600': getStepStatus({{ forloop.counter0 }}) === 'current',
+                'border-blue-600 bg-blue-600': getStepStatus({{ forloop.counter0 }}) === 'complete',
+                'border-gray-300 bg-white': getStepStatus({{ forloop.counter0 }}) === 'upcoming',
+                'border-gray-300 bg-gray-100': getStepStatus({{ forloop.counter0 }}) === 'locked'
+              }"
+            >
+              <!-- Step number or checkmark -->
+              <template x-if="getStepStatus({{ forloop.counter0 }}) === 'complete'">
+                <svg class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </template>
+              <template x-if="getStepStatus({{ forloop.counter0 }}) === 'current'">
+                <span class="text-white font-semibold">{{ forloop.counter }}</span>
+              </template>
+              <template x-if="getStepStatus({{ forloop.counter0 }}) === 'upcoming' || getStepStatus({{ forloop.counter0 }}) === 'locked'">
+                <span class="text-gray-500 font-semibold">{{ forloop.counter }}</span>
+              </template>
+            </div>
+
+            <!-- Step label -->
+            <div class="ml-3 text-left hidden sm:block">
+              <p
+                class="text-sm font-medium transition-colors"
+                :class="{
+                  'text-blue-600': getStepStatus({{ forloop.counter0 }}) === 'current',
+                  'text-gray-900': getStepStatus({{ forloop.counter0 }}) === 'complete',
+                  'text-gray-500': getStepStatus({{ forloop.counter0 }}) === 'upcoming' || getStepStatus({{ forloop.counter0 }}) === 'locked'
+                }"
+              >
+                {{ step.title }}
+              </p>
+              {% if step.description %}
+              <p class="text-xs text-gray-500">{{ step.description }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </button>
+
+        <!-- Connector line -->
+        {% if not forloop.last %}
+        <div class="absolute top-5 right-0 hidden h-0.5 w-full sm:block" aria-hidden="true">
+          <div
+            class="h-full transition-colors duration-300"
+            :class="{
+              'bg-blue-600': isStepComplete({{ forloop.counter0 }}),
+              'bg-gray-300': !isStepComplete({{ forloop.counter0 }})
+            }"
+          ></div>
+        </div>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </nav>
+
+  <!-- Step Content Area -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 min-h-[400px]">
+    <!-- Step 1 Content -->
+    <div x-show="currentStep === 0" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0">
+      <div id="wizard-{{ wizard_id }}-step-0-content">
+        {% block step_0_content %}
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Step 1: {{ wizard_steps.0.title|default:"First Step" }}</h3>
+        <p class="text-gray-600 mb-4">This is the content area for the first step of your wizard.</p>
+        <div class="space-y-4">
+          <input type="text" placeholder="Example input" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+          <textarea placeholder="Example textarea" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg"></textarea>
+        </div>
+        {% endblock %}
+      </div>
+    </div>
+
+    <!-- Step 2 Content -->
+    <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0">
+      <div id="wizard-{{ wizard_id }}-step-1-content">
+        {% block step_1_content %}
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Step 2: {{ wizard_steps.1.title|default:"Second Step" }}</h3>
+        <p class="text-gray-600 mb-4">This is the content area for the second step of your wizard.</p>
+        <div class="space-y-4">
+          <select class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+            <option>Option 1</option>
+            <option>Option 2</option>
+            <option>Option 3</option>
+          </select>
+        </div>
+        {% endblock %}
+      </div>
+    </div>
+
+    <!-- Step 3 Content -->
+    <div x-show="currentStep === 2" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0">
+      <div id="wizard-{{ wizard_id }}-step-2-content">
+        {% block step_2_content %}
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Step 3: {{ wizard_steps.2.title|default:"Final Step" }}</h3>
+        <p class="text-gray-600 mb-4">Review your information and complete the wizard.</p>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <p class="text-sm text-gray-700">Summary of your selections will appear here.</p>
+        </div>
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="flex justify-between items-center">
+    <!-- Previous Button -->
+    <button
+      type="button"
+      @click="prevStep()"
+      x-show="currentStep > 0"
+      class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Previous
+    </button>
+
+    <!-- Skip Button (if allowed) -->
+    {% if wizard_allow_skip %}
+    <button
+      type="button"
+      @click="nextStep()"
+      x-show="currentStep < totalSteps - 1"
+      class="text-sm text-gray-600 hover:text-gray-900 underline"
+    >
+      Skip this step
+    </button>
+    {% endif %}
+
+    <!-- Next/Complete Button -->
+    <button
+      type="button"
+      @click="nextStep()"
+      x-show="currentStep < totalSteps - 1"
+      class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+    >
+      Next
+      <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+
+    <!-- Complete Button -->
+    <button
+      type="button"
+      x-show="currentStep === totalSteps - 1"
+      class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+      @click="alert('Wizard completed!')"
+    >
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+      Complete
+    </button>
+  </div>
+</div>
+
+{% endwith %}
