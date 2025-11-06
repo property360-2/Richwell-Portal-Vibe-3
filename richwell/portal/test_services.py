@@ -240,8 +240,7 @@ class GradeServiceTests(TestCase):
             student_subject=self.enrollment,
             subject=self.subject,
             professor=self.professor_user,
-            numeric_grade=1.5,
-            letter_grade='A'
+            grade='1.50'
         )
 
         # Update enrollment status

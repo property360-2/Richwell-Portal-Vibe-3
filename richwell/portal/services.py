@@ -107,21 +107,34 @@ class EnrollmentService:
         return recommended
 
     @staticmethod
+    def validate_enrollment(student: Student, section: Section) -> Tuple[bool, Optional[str]]:
+        """
+        Validate if a student can enroll in a section
+        Returns (is_valid, error_message)
+        """
+        # Check subject prerequisites
+        can_enroll, reason = EnrollmentService.can_enroll_in_subject(
+            student, section.subject, section.term
+        )
+        if not can_enroll:
+            return False, reason
+
+        # Check section capacity
+        if section.status == 'full' or section.is_full():
+            return False, f"Section {section.section_code} is full"
+
+        return True, None
+
+    @staticmethod
     @transaction.atomic
     def enroll_student(student: Student, section: Section, term: Term, actor=None) -> StudentSubject:
         """
         Enroll a student in a section
         """
         # Validate enrollment
-        can_enroll, reason = EnrollmentService.can_enroll_in_subject(
-            student, section.subject, term
-        )
-        if not can_enroll:
-            raise ValueError(reason)
-
-        # Check section capacity
-        if section.is_full():
-            raise ValueError(f"Section {section.section_code} is full")
+        is_valid, error_msg = EnrollmentService.validate_enrollment(student, section)
+        if not is_valid:
+            raise ValueError(error_msg)
 
         # Create enrollment
         enrollment = StudentSubject.objects.create(
@@ -398,6 +411,19 @@ class SectionService:
         Check if section is available for enrollment
         """
         return section.status == 'open' and not section.is_full()
+
+    @staticmethod
+    def get_section_availability(section: Section) -> Dict:
+        """
+        Get section availability information
+        Returns dict with capacity, enrolled, and available counts
+        """
+        enrolled = SectionService.get_enrollment_count(section)
+        return {
+            'capacity': section.capacity,
+            'enrolled': enrolled,
+            'available': section.capacity - enrolled
+        }
 
 
 class AdmissionService:
