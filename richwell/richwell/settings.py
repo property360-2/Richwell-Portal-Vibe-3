@@ -114,6 +114,11 @@ USE_TZ = True
 # Custom User Model
 AUTH_USER_MODEL = "portal.User"
 
+# Authentication URLs
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "dashboard"
+LOGOUT_REDIRECT_URL = "login"
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
