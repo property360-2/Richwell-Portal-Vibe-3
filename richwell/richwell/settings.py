@@ -105,11 +105,14 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Manila"
 
 USE_I18N = True
 
 USE_TZ = True
+
+# Custom User Model
+AUTH_USER_MODEL = "portal.User"
 
 
 # Static files (CSS, JavaScript, Images)
