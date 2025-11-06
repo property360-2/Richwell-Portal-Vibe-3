@@ -1,0 +1,134 @@
+{% extends 'portal/base.html' %}
+
+{% block title %}INC Grade Tracking - Richwell School Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                    <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Total INC Grades</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ total_count }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-yellow-100 rounded-md p-3">
+                    <svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Critical (≤30 days)</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ critical_count }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-red-100 rounded-md p-3">
+                    <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Expired</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ expired_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">INC Grade Expiration Tracking</h2>
+                    <p class="text-gray-600 mt-1">Monitor incomplete grades and their deadlines</p>
+                </div>
+                <a href="{% url 'reports_dashboard' %}"
+                   class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- INC Grades Table -->
+        <div class="overflow-x-auto">
+            {% if inc_data %}
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Term</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Posted Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expiration Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Days Remaining</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for data in inc_data %}
+                    <tr class="hover:bg-gray-50 {% if data.status == 'expired' %}bg-red-50{% elif data.status == 'critical' %}bg-yellow-50{% endif %}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ data.student.user.get_full_name }}</div>
+                            <div class="text-sm text-gray-500">{{ data.student.user.username }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ data.grade.subject.code }}</div>
+                            <div class="text-sm text-gray-500">{{ data.deadline_months }} months deadline</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ data.grade.student_subject.term.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ data.posted_date|date:"M d, Y" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ data.expiration_date|date:"M d, Y" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium {% if data.days_remaining < 0 %}text-red-600{% elif data.days_remaining <= 30 %}text-yellow-600{% else %}text-gray-900{% endif %}">
+                            {{ data.days_remaining }} days
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if data.status == 'expired' %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Expired</span>
+                            {% elif data.status == 'critical' %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Critical</span>
+                            {% else %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="px-6 py-12 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No INC grades found</h3>
+                <p class="mt-1 text-sm text-gray-500">There are no incomplete grades to track.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 class="text-sm font-semibold text-blue-900 mb-2">INC Grade Policy</h4>
+        <ul class="text-sm text-blue-700 space-y-1">
+            <li><strong>Major Subjects:</strong> 6 months deadline to complete</li>
+            <li><strong>Minor Subjects:</strong> 12 months deadline to complete</li>
+            <li><strong>Critical Status:</strong> Less than 30 days remaining</li>
+            <li><strong>Expired:</strong> Deadline has passed</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

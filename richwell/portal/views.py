@@ -1226,3 +1226,1052 @@ def setting_edit(request, setting_id):
     }
 
     return render(request, 'portal/setting_form.html', context)
+
+
+# ============= CURRICULUM MANAGEMENT =============
+
+@login_required
+def curriculum_management(request):
+    """
+    Registrar curriculum management - list all curricula
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Curriculum
+
+    curricula = Curriculum.objects.select_related('program').all().order_by('program__name', '-effective_sy')
+
+    context = {
+        'curricula': curricula,
+    }
+
+    return render(request, 'portal/curriculum_management.html', context)
+
+
+@login_required
+def curriculum_create(request):
+    """
+    Create a new curriculum
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Curriculum, Program, AuditTrail
+    from django import forms
+
+    class CurriculumForm(forms.ModelForm):
+        class Meta:
+            model = Curriculum
+            fields = ['program', 'version', 'effective_sy', 'active']
+            widgets = {
+                'program': forms.Select(attrs={'class': 'form-control'}),
+                'version': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., CHED 2021 Rev'}),
+                'effective_sy': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., AY 2021-2022'}),
+            }
+
+    if request.method == 'POST':
+        form = CurriculumForm(request.POST)
+        if form.is_valid():
+            curriculum = form.save(commit=False)
+
+            # If this curriculum is set as active, deactivate other curricula for the same program
+            if curriculum.active:
+                Curriculum.objects.filter(program=curriculum.program, active=True).update(active=False)
+
+            curriculum.save()
+
+            # Log creation
+            AuditTrail.objects.create(
+                actor=request.user,
+                action='create_curriculum',
+                entity='Curriculum',
+                entity_id=curriculum.id,
+                new_value_json={'program': curriculum.program.name, 'version': curriculum.version}
+            )
+
+            messages.success(request, f'Curriculum "{curriculum.version}" created successfully')
+            return redirect('curriculum_management')
+    else:
+        form = CurriculumForm()
+
+    context = {
+        'form': form,
+        'action': 'Create',
+    }
+
+    return render(request, 'portal/curriculum_form.html', context)
+
+
+@login_required
+def curriculum_edit(request, curriculum_id):
+    """
+    Edit an existing curriculum
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Curriculum, AuditTrail
+    from django import forms
+
+    try:
+        curriculum = Curriculum.objects.get(id=curriculum_id)
+    except Curriculum.DoesNotExist:
+        messages.error(request, 'Curriculum not found.')
+        return redirect('curriculum_management')
+
+    class CurriculumForm(forms.ModelForm):
+        class Meta:
+            model = Curriculum
+            fields = ['program', 'version', 'effective_sy', 'active']
+            widgets = {
+                'program': forms.Select(attrs={'class': 'form-control'}),
+                'version': forms.TextInput(attrs={'class': 'form-control'}),
+                'effective_sy': forms.TextInput(attrs={'class': 'form-control'}),
+            }
+
+    if request.method == 'POST':
+        form = CurriculumForm(request.POST, instance=curriculum)
+        if form.is_valid():
+            old_values = {'version': curriculum.version, 'active': curriculum.active}
+            curriculum = form.save(commit=False)
+
+            # If this curriculum is set as active, deactivate other curricula for the same program
+            if curriculum.active:
+                Curriculum.objects.filter(program=curriculum.program, active=True).exclude(id=curriculum.id).update(active=False)
+
+            curriculum.save()
+
+            # Log update
+            AuditTrail.objects.create(
+                actor=request.user,
+                action='update_curriculum',
+                entity='Curriculum',
+                entity_id=curriculum.id,
+                old_value_json=old_values,
+                new_value_json={'version': curriculum.version, 'active': curriculum.active}
+            )
+
+            messages.success(request, f'Curriculum "{curriculum.version}" updated successfully')
+            return redirect('curriculum_management')
+    else:
+        form = CurriculumForm(instance=curriculum)
+
+    context = {
+        'form': form,
+        'curriculum': curriculum,
+        'action': 'Edit',
+    }
+
+    return render(request, 'portal/curriculum_form.html', context)
+
+
+@login_required
+def curriculum_delete(request, curriculum_id):
+    """
+    Delete a curriculum
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Curriculum, AuditTrail
+
+    try:
+        curriculum = Curriculum.objects.get(id=curriculum_id)
+    except Curriculum.DoesNotExist:
+        messages.error(request, 'Curriculum not found.')
+        return redirect('curriculum_management')
+
+    # Check if curriculum has students
+    if curriculum.students.exists():
+        messages.error(request, f'Cannot delete curriculum "{curriculum.version}" - it has students assigned to it')
+        return redirect('curriculum_management')
+
+    if request.method == 'POST':
+        curriculum_version = curriculum.version
+
+        # Log deletion
+        AuditTrail.objects.create(
+            actor=request.user,
+            action='delete_curriculum',
+            entity='Curriculum',
+            entity_id=curriculum.id,
+            old_value_json={'version': curriculum.version, 'program': curriculum.program.name}
+        )
+
+        curriculum.delete()
+        messages.success(request, f'Curriculum "{curriculum_version}" deleted successfully')
+        return redirect('curriculum_management')
+
+    context = {
+        'curriculum': curriculum,
+    }
+
+    return render(request, 'portal/curriculum_confirm_delete.html', context)
+
+
+# ============= SUBJECT MANAGEMENT =============
+
+@login_required
+def subject_management(request):
+    """
+    Registrar subject management - list all subjects
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Subject
+
+    subjects = Subject.objects.select_related('program').all().order_by('program__name', 'code')
+
+    # Filter by program if specified
+    program_id = request.GET.get('program')
+    if program_id:
+        subjects = subjects.filter(program_id=program_id)
+
+    context = {
+        'subjects': subjects,
+    }
+
+    return render(request, 'portal/subject_management.html', context)
+
+
+@login_required
+def subject_create(request):
+    """
+    Create a new subject
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Subject, AuditTrail
+    from django import forms
+
+    class SubjectForm(forms.ModelForm):
+        class Meta:
+            model = Subject
+            fields = ['program', 'code', 'title', 'description', 'units', 'type', 'recommended_year', 'recommended_sem', 'active']
+            widgets = {
+                'program': forms.Select(attrs={'class': 'form-control'}),
+                'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., CS101'}),
+                'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Introduction to Computing'}),
+                'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+                'units': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
+                'type': forms.Select(attrs={'class': 'form-control'}),
+                'recommended_year': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 6}),
+                'recommended_sem': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 3}),
+            }
+
+    if request.method == 'POST':
+        form = SubjectForm(request.POST)
+        if form.is_valid():
+            subject = form.save()
+
+            # Log creation
+            AuditTrail.objects.create(
+                actor=request.user,
+                action='create_subject',
+                entity='Subject',
+                entity_id=subject.id,
+                new_value_json={'code': subject.code, 'title': subject.title}
+            )
+
+            messages.success(request, f'Subject "{subject.code}" created successfully')
+            return redirect('subject_management')
+    else:
+        form = SubjectForm()
+
+    context = {
+        'form': form,
+        'action': 'Create',
+    }
+
+    return render(request, 'portal/subject_form.html', context)
+
+
+@login_required
+def subject_edit(request, subject_id):
+    """
+    Edit an existing subject
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Subject, AuditTrail
+    from django import forms
+
+    try:
+        subject = Subject.objects.get(id=subject_id)
+    except Subject.DoesNotExist:
+        messages.error(request, 'Subject not found.')
+        return redirect('subject_management')
+
+    class SubjectForm(forms.ModelForm):
+        class Meta:
+            model = Subject
+            fields = ['program', 'code', 'title', 'description', 'units', 'type', 'recommended_year', 'recommended_sem', 'active']
+            widgets = {
+                'program': forms.Select(attrs={'class': 'form-control'}),
+                'code': forms.TextInput(attrs={'class': 'form-control'}),
+                'title': forms.TextInput(attrs={'class': 'form-control'}),
+                'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+                'units': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.5'}),
+                'type': forms.Select(attrs={'class': 'form-control'}),
+                'recommended_year': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 6}),
+                'recommended_sem': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 3}),
+            }
+
+    if request.method == 'POST':
+        form = SubjectForm(request.POST, instance=subject)
+        if form.is_valid():
+            old_values = {'code': subject.code, 'title': subject.title, 'units': float(subject.units)}
+            subject = form.save()
+
+            # Log update
+            AuditTrail.objects.create(
+                actor=request.user,
+                action='update_subject',
+                entity='Subject',
+                entity_id=subject.id,
+                old_value_json=old_values,
+                new_value_json={'code': subject.code, 'title': subject.title, 'units': float(subject.units)}
+            )
+
+            messages.success(request, f'Subject "{subject.code}" updated successfully')
+            return redirect('subject_management')
+    else:
+        form = SubjectForm(instance=subject)
+
+    context = {
+        'form': form,
+        'subject': subject,
+        'action': 'Edit',
+    }
+
+    return render(request, 'portal/subject_form.html', context)
+
+
+@login_required
+def subject_delete(request, subject_id):
+    """
+    Delete a subject
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Subject, AuditTrail
+
+    try:
+        subject = Subject.objects.get(id=subject_id)
+    except Subject.DoesNotExist:
+        messages.error(request, 'Subject not found.')
+        return redirect('subject_management')
+
+    # Check if subject has sections or enrollments
+    if subject.sections.exists() or subject.student_enrollments.exists():
+        messages.error(request, f'Cannot delete subject "{subject.code}" - it has existing sections or enrollments')
+        return redirect('subject_management')
+
+    if request.method == 'POST':
+        subject_code = subject.code
+
+        # Log deletion
+        AuditTrail.objects.create(
+            actor=request.user,
+            action='delete_subject',
+            entity='Subject',
+            entity_id=subject.id,
+            old_value_json={'code': subject.code, 'title': subject.title}
+        )
+
+        subject.delete()
+        messages.success(request, f'Subject "{subject_code}" deleted successfully')
+        return redirect('subject_management')
+
+    context = {
+        'subject': subject,
+    }
+
+    return render(request, 'portal/subject_confirm_delete.html', context)
+
+
+# ============= CURRICULUM SUBJECT MAPPING =============
+
+@login_required
+def curriculum_subjects(request, curriculum_id):
+    """
+    Manage subjects mapped to a curriculum
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Curriculum, CurriculumSubject, Subject
+
+    try:
+        curriculum = Curriculum.objects.select_related('program').get(id=curriculum_id)
+    except Curriculum.DoesNotExist:
+        messages.error(request, 'Curriculum not found.')
+        return redirect('curriculum_management')
+
+    # Get all curriculum subjects organized by year and term
+    curriculum_subjects = CurriculumSubject.objects.filter(
+        curriculum=curriculum
+    ).select_related('subject').order_by('year_level', 'term_no')
+
+    # Get available subjects for this program that aren't already mapped
+    mapped_subject_ids = curriculum_subjects.values_list('subject_id', flat=True)
+    available_subjects = Subject.objects.filter(
+        program=curriculum.program,
+        active=True
+    ).exclude(id__in=mapped_subject_ids)
+
+    context = {
+        'curriculum': curriculum,
+        'curriculum_subjects': curriculum_subjects,
+        'available_subjects': available_subjects,
+    }
+
+    return render(request, 'portal/curriculum_subjects.html', context)
+
+
+@login_required
+def curriculum_subject_add(request, curriculum_id):
+    """
+    Add a subject to a curriculum
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Curriculum, CurriculumSubject, Subject, AuditTrail
+    from django import forms
+
+    try:
+        curriculum = Curriculum.objects.get(id=curriculum_id)
+    except Curriculum.DoesNotExist:
+        messages.error(request, 'Curriculum not found.')
+        return redirect('curriculum_management')
+
+    class CurriculumSubjectForm(forms.ModelForm):
+        subject = forms.ModelChoiceField(
+            queryset=Subject.objects.filter(program=curriculum.program, active=True),
+            widget=forms.Select(attrs={'class': 'form-control'})
+        )
+
+        class Meta:
+            model = CurriculumSubject
+            fields = ['subject', 'year_level', 'term_no', 'is_recommended']
+            widgets = {
+                'year_level': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 6}),
+                'term_no': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 3}),
+            }
+
+    if request.method == 'POST':
+        form = CurriculumSubjectForm(request.POST)
+        if form.is_valid():
+            curriculum_subject = form.save(commit=False)
+            curriculum_subject.curriculum = curriculum
+            curriculum_subject.save()
+
+            # Log creation
+            AuditTrail.objects.create(
+                actor=request.user,
+                action='add_curriculum_subject',
+                entity='CurriculumSubject',
+                entity_id=curriculum_subject.id,
+                new_value_json={
+                    'curriculum': curriculum.version,
+                    'subject': curriculum_subject.subject.code,
+                    'year_level': curriculum_subject.year_level,
+                    'term_no': curriculum_subject.term_no
+                }
+            )
+
+            messages.success(request, f'Subject "{curriculum_subject.subject.code}" added to curriculum')
+            return redirect('curriculum_subjects', curriculum_id=curriculum.id)
+    else:
+        form = CurriculumSubjectForm()
+
+    context = {
+        'form': form,
+        'curriculum': curriculum,
+        'action': 'Add',
+    }
+
+    return render(request, 'portal/curriculum_subject_form.html', context)
+
+
+@login_required
+def curriculum_subject_remove(request, curriculum_subject_id):
+    """
+    Remove a subject from a curriculum
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import CurriculumSubject, AuditTrail
+
+    try:
+        curriculum_subject = CurriculumSubject.objects.select_related('curriculum', 'subject').get(id=curriculum_subject_id)
+    except CurriculumSubject.DoesNotExist:
+        messages.error(request, 'Curriculum subject mapping not found.')
+        return redirect('curriculum_management')
+
+    curriculum_id = curriculum_subject.curriculum.id
+
+    if request.method == 'POST':
+        # Log deletion
+        AuditTrail.objects.create(
+            actor=request.user,
+            action='remove_curriculum_subject',
+            entity='CurriculumSubject',
+            entity_id=curriculum_subject.id,
+            old_value_json={
+                'curriculum': curriculum_subject.curriculum.version,
+                'subject': curriculum_subject.subject.code
+            }
+        )
+
+        curriculum_subject.delete()
+        messages.success(request, f'Subject removed from curriculum')
+        return redirect('curriculum_subjects', curriculum_id=curriculum_id)
+
+    context = {
+        'curriculum_subject': curriculum_subject,
+    }
+
+    return render(request, 'portal/curriculum_subject_confirm_delete.html', context)
+
+
+# ============= PREREQUISITE MANAGEMENT =============
+
+@login_required
+def prerequisite_management(request, subject_id):
+    """
+    Manage prerequisites for a subject
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Subject, Prerequisite
+
+    try:
+        subject = Subject.objects.select_related('program').get(id=subject_id)
+    except Subject.DoesNotExist:
+        messages.error(request, 'Subject not found.')
+        return redirect('subject_management')
+
+    # Get all prerequisites for this subject
+    prerequisites = Prerequisite.objects.filter(
+        subject=subject
+    ).select_related('prereq_subject')
+
+    # Get available subjects for prerequisites (same program, excluding self and existing prerequisites)
+    existing_prereq_ids = prerequisites.values_list('prereq_subject_id', flat=True)
+    available_prereqs = Subject.objects.filter(
+        program=subject.program,
+        active=True
+    ).exclude(id=subject.id).exclude(id__in=existing_prereq_ids)
+
+    context = {
+        'subject': subject,
+        'prerequisites': prerequisites,
+        'available_prereqs': available_prereqs,
+    }
+
+    return render(request, 'portal/prerequisite_management.html', context)
+
+
+@login_required
+def prerequisite_add(request, subject_id):
+    """
+    Add a prerequisite to a subject
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Subject, Prerequisite, AuditTrail
+    from django import forms
+
+    try:
+        subject = Subject.objects.get(id=subject_id)
+    except Subject.DoesNotExist:
+        messages.error(request, 'Subject not found.')
+        return redirect('subject_management')
+
+    class PrerequisiteForm(forms.ModelForm):
+        prereq_subject = forms.ModelChoiceField(
+            queryset=Subject.objects.filter(program=subject.program, active=True).exclude(id=subject.id),
+            widget=forms.Select(attrs={'class': 'form-control'}),
+            label='Prerequisite Subject'
+        )
+
+        class Meta:
+            model = Prerequisite
+            fields = ['prereq_subject']
+
+    if request.method == 'POST':
+        form = PrerequisiteForm(request.POST)
+        if form.is_valid():
+            prerequisite = form.save(commit=False)
+            prerequisite.subject = subject
+            prerequisite.save()
+
+            # Log creation
+            AuditTrail.objects.create(
+                actor=request.user,
+                action='add_prerequisite',
+                entity='Prerequisite',
+                entity_id=prerequisite.id,
+                new_value_json={
+                    'subject': subject.code,
+                    'prereq_subject': prerequisite.prereq_subject.code
+                }
+            )
+
+            messages.success(request, f'Prerequisite "{prerequisite.prereq_subject.code}" added')
+            return redirect('prerequisite_management', subject_id=subject.id)
+    else:
+        form = PrerequisiteForm()
+
+    context = {
+        'form': form,
+        'subject': subject,
+        'action': 'Add',
+    }
+
+    return render(request, 'portal/prerequisite_form.html', context)
+
+
+@login_required
+def prerequisite_remove(request, prerequisite_id):
+    """
+    Remove a prerequisite
+    """
+    if not request.user.is_registrar():
+        messages.error(request, 'Access denied: Registrar only')
+        return redirect('dashboard')
+
+    from .models import Prerequisite, AuditTrail
+
+    try:
+        prerequisite = Prerequisite.objects.select_related('subject', 'prereq_subject').get(id=prerequisite_id)
+    except Prerequisite.DoesNotExist:
+        messages.error(request, 'Prerequisite not found.')
+        return redirect('subject_management')
+
+    subject_id = prerequisite.subject.id
+
+    if request.method == 'POST':
+        # Log deletion
+        AuditTrail.objects.create(
+            actor=request.user,
+            action='remove_prerequisite',
+            entity='Prerequisite',
+            entity_id=prerequisite.id,
+            old_value_json={
+                'subject': prerequisite.subject.code,
+                'prereq_subject': prerequisite.prereq_subject.code
+            }
+        )
+
+        prerequisite.delete()
+        messages.success(request, 'Prerequisite removed successfully')
+        return redirect('prerequisite_management', subject_id=subject_id)
+
+    context = {
+        'prerequisite': prerequisite,
+    }
+
+    return render(request, 'portal/prerequisite_confirm_delete.html', context)
+
+
+# ============= STUDENT ADMISSION PROCESSING =============
+
+@login_required
+def admission_processing(request):
+    """
+    Admission staff dashboard for processing student applications
+    """
+    if not request.user.is_admission_staff():
+        messages.error(request, 'Access denied: Admission staff only')
+        return redirect('dashboard')
+
+    from .models import Student, User
+
+    # Get all students without profiles (potential new applicants)
+    # For now, list all students with their status
+    students = Student.objects.select_related('user', 'program', 'curriculum').all().order_by('-created_at')
+
+    # Count by status
+    active_count = students.filter(status='active').count()
+    inactive_count = students.filter(status='inactive').count()
+    graduated_count = students.filter(status='graduated').count()
+
+    context = {
+        'students': students,
+        'active_count': active_count,
+        'inactive_count': inactive_count,
+        'graduated_count': graduated_count,
+    }
+
+    return render(request, 'portal/admission_processing.html', context)
+
+
+@login_required
+def student_admit(request):
+    """
+    Admit a new student
+    """
+    if not request.user.is_admission_staff() and not request.user.is_registrar():
+        messages.error(request, 'Access denied: Admission staff or Registrar only')
+        return redirect('dashboard')
+
+    from .models import Student, User, Program, Curriculum, AuditTrail
+    from django import forms
+
+    class UserForm(forms.ModelForm):
+        password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+        class Meta:
+            model = User
+            fields = ['username', 'first_name', 'last_name', 'email', 'password']
+            widgets = {
+                'username': forms.TextInput(attrs={'class': 'form-control'}),
+                'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+                'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+                'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            }
+
+    class StudentForm(forms.ModelForm):
+        class Meta:
+            model = Student
+            fields = ['program', 'curriculum', 'status']
+            widgets = {
+                'program': forms.Select(attrs={'class': 'form-control'}),
+                'curriculum': forms.Select(attrs={'class': 'form-control'}),
+                'status': forms.Select(attrs={'class': 'form-control'}),
+            }
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            # Filter curriculum to show only active ones
+            self.fields['curriculum'].queryset = Curriculum.objects.filter(active=True).select_related('program')
+
+    if request.method == 'POST':
+        user_form = UserForm(request.POST)
+        student_form = StudentForm(request.POST)
+
+        if user_form.is_valid() and student_form.is_valid():
+            # Create user
+            user = user_form.save(commit=False)
+            user.role = 'student'
+            user.set_password(user_form.cleaned_data['password'])
+            user.save()
+
+            # Create student profile
+            student = student_form.save(commit=False)
+            student.user = user
+            student.save()
+
+            # Log admission
+            AuditTrail.objects.create(
+                actor=request.user,
+                action='admit_student',
+                entity='Student',
+                entity_id=student.id,
+                new_value_json={
+                    'username': user.username,
+                    'program': student.program.name,
+                    'curriculum': student.curriculum.version
+                }
+            )
+
+            messages.success(request, f'Student "{user.username}" admitted successfully')
+            return redirect('admission_processing')
+    else:
+        user_form = UserForm()
+        student_form = StudentForm()
+
+    context = {
+        'user_form': user_form,
+        'student_form': student_form,
+        'action': 'Admit',
+    }
+
+    return render(request, 'portal/student_admit.html', context)
+
+
+@login_required
+def student_status_update(request, student_id):
+    """
+    Update student status (active, inactive, graduated)
+    """
+    if not request.user.is_admission_staff() and not request.user.is_registrar():
+        messages.error(request, 'Access denied: Admission staff or Registrar only')
+        return redirect('dashboard')
+
+    from .models import Student, AuditTrail
+
+    try:
+        student = Student.objects.get(id=student_id)
+    except Student.DoesNotExist:
+        messages.error(request, 'Student not found.')
+        return redirect('admission_processing')
+
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in dict(Student.STATUS_CHOICES):
+            old_status = student.status
+            student.status = new_status
+            student.save()
+
+            # Log status change
+            AuditTrail.objects.create(
+                actor=request.user,
+                action='update_student_status',
+                entity='Student',
+                entity_id=student.id,
+                old_value_json={'status': old_status},
+                new_value_json={'status': new_status}
+            )
+
+            messages.success(request, f'Student status updated to "{new_status}"')
+        else:
+            messages.error(request, 'Invalid status')
+
+    return redirect('admission_processing')
+
+
+# ============= ADVANCED REPORTING =============
+
+@login_required
+def reports_dashboard(request):
+    """
+    Advanced reporting dashboard
+    """
+    if not request.user.is_dean() and not request.user.is_registrar():
+        messages.error(request, 'Access denied: Dean or Registrar only')
+        return redirect('dashboard')
+
+    from .models import Program, Term, Grade, StudentSubject
+    from django.db.models import Count, Avg, Q
+    from decimal import Decimal
+
+    # Get active term
+    active_term = Term.objects.filter(is_active=True).first()
+
+    # Overall statistics
+    total_students = StudentSubject.objects.filter(status='enrolled').values('student').distinct().count()
+    total_enrollments = StudentSubject.objects.filter(status='enrolled').count()
+
+    # Grade distribution
+    grades = Grade.objects.all()
+    passing_grades = grades.filter(grade__in=['1.00', '1.25', '1.50', '1.75', '2.00', '2.25', '2.50', '2.75', '3.00', 'P']).count()
+    failing_grades = grades.filter(grade__in=['5.00', 'DRP']).count()
+    inc_grades = grades.filter(grade='INC').count()
+
+    # Program-wise enrollment
+    program_stats = Program.objects.annotate(
+        enrollment_count=Count('subjects__student_enrollments', filter=Q(subjects__student_enrollments__status='enrolled'))
+    ).order_by('-enrollment_count')
+
+    context = {
+        'active_term': active_term,
+        'total_students': total_students,
+        'total_enrollments': total_enrollments,
+        'passing_grades': passing_grades,
+        'failing_grades': failing_grades,
+        'inc_grades': inc_grades,
+        'program_stats': program_stats,
+    }
+
+    return render(request, 'portal/reports_dashboard.html', context)
+
+
+@login_required
+def report_grade_distribution(request):
+    """
+    Detailed grade distribution report
+    """
+    if not request.user.is_dean() and not request.user.is_registrar():
+        messages.error(request, 'Access denied: Dean or Registrar only')
+        return redirect('dashboard')
+
+    from .models import Grade, Term, Subject
+    from django.db.models import Count
+
+    # Filter options
+    term_id = request.GET.get('term')
+    subject_id = request.GET.get('subject')
+
+    grades = Grade.objects.all()
+
+    if term_id:
+        grades = grades.filter(student_subject__term_id=term_id)
+
+    if subject_id:
+        grades = grades.filter(subject_id=subject_id)
+
+    # Count by grade value
+    grade_counts = grades.values('grade').annotate(count=Count('id')).order_by('-count')
+
+    # Get filter options
+    terms = Term.objects.all().order_by('-start_date')
+    subjects = Subject.objects.all().order_by('code')
+
+    context = {
+        'grade_counts': grade_counts,
+        'terms': terms,
+        'subjects': subjects,
+        'selected_term': term_id,
+        'selected_subject': subject_id,
+    }
+
+    return render(request, 'portal/report_grade_distribution.html', context)
+
+
+@login_required
+def report_student_performance(request):
+    """
+    Student performance report (GPA, completion rates, etc.)
+    """
+    if not request.user.is_dean() and not request.user.is_registrar():
+        messages.error(request, 'Access denied: Dean or Registrar only')
+        return redirect('dashboard')
+
+    from .models import Student, StudentSubject, Grade
+    from django.db.models import Count, Q
+    from decimal import Decimal
+
+    # Get all students with their stats
+    students = Student.objects.select_related('user', 'program').all()
+
+    student_data = []
+    for student in students:
+        # Get all completed subjects with grades
+        completed = StudentSubject.objects.filter(
+            student=student,
+            status='completed'
+        ).select_related('grade_record')
+
+        # Calculate GPA
+        total_grade_points = Decimal('0.0')
+        total_units = Decimal('0.0')
+
+        for ss in completed:
+            if hasattr(ss, 'grade_record'):
+                try:
+                    grade_value = Decimal(ss.grade_record.grade)
+                    total_grade_points += grade_value * ss.subject.units
+                    total_units += ss.subject.units
+                except (ValueError, TypeError):
+                    pass
+
+        gpa = (total_grade_points / total_units) if total_units > 0 else Decimal('0.0')
+
+        # Count enrollments by status
+        enrolled_count = StudentSubject.objects.filter(student=student, status='enrolled').count()
+        completed_count = completed.count()
+        failed_count = StudentSubject.objects.filter(student=student, status='failed').count()
+        inc_count = StudentSubject.objects.filter(student=student, status='inc').count()
+
+        student_data.append({
+            'student': student,
+            'gpa': round(gpa, 2),
+            'enrolled_count': enrolled_count,
+            'completed_count': completed_count,
+            'failed_count': failed_count,
+            'inc_count': inc_count,
+        })
+
+    # Sort by GPA descending
+    student_data.sort(key=lambda x: x['gpa'], reverse=True)
+
+    context = {
+        'student_data': student_data,
+    }
+
+    return render(request, 'portal/report_student_performance.html', context)
+
+
+# ============= INC GRADE EXPIRATION TRACKING =============
+
+@login_required
+def inc_grade_tracking(request):
+    """
+    Track INC grades and their expiration deadlines
+    """
+    if not request.user.is_dean() and not request.user.is_registrar():
+        messages.error(request, 'Access denied: Dean or Registrar only')
+        return redirect('dashboard')
+
+    from .models import Grade, StudentSubject
+    from django.utils import timezone
+    from datetime import timedelta
+
+    # Get all INC grades
+    inc_grades = Grade.objects.filter(
+        grade='INC'
+    ).select_related('student_subject__student__user', 'subject', 'student_subject__term')
+
+    # Calculate expiration status
+    today = timezone.now().date()
+    inc_data = []
+
+    for grade in inc_grades:
+        # Get deadline in months based on subject type
+        deadline_months = grade.subject.get_inc_deadline_months()
+
+        # Calculate expiration date
+        posted_date = grade.posted_at.date()
+        expiration_date = posted_date + timedelta(days=deadline_months * 30)  # Approximate
+
+        # Calculate days remaining
+        days_remaining = (expiration_date - today).days
+
+        # Determine status
+        if days_remaining < 0:
+            status = 'expired'
+            status_class = 'danger'
+        elif days_remaining <= 30:
+            status = 'critical'
+            status_class = 'warning'
+        else:
+            status = 'active'
+            status_class = 'success'
+
+        inc_data.append({
+            'grade': grade,
+            'student': grade.student_subject.student,
+            'posted_date': posted_date,
+            'expiration_date': expiration_date,
+            'days_remaining': days_remaining,
+            'deadline_months': deadline_months,
+            'status': status,
+            'status_class': status_class,
+        })
+
+    # Sort by days remaining (expired first, then by urgency)
+    inc_data.sort(key=lambda x: x['days_remaining'])
+
+    context = {
+        'inc_data': inc_data,
+        'total_count': len(inc_data),
+        'expired_count': len([x for x in inc_data if x['status'] == 'expired']),
+        'critical_count': len([x for x in inc_data if x['status'] == 'critical']),
+    }
+
+    return render(request, 'portal/inc_grade_tracking.html', context)
