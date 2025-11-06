@@ -18,9 +18,7 @@
         <!-- Messages -->
         {% if messages %}
         {% for message in messages %}
-        <div class="{% if message.tags == 'error' %}bg-red-100 border-red-400 text-red-700{% elif message.tags == 'success' %}bg-green-100 border-green-400 text-green-700{% else %}bg-blue-100 border-blue-400 text-blue-700{% endif %} border px-4 py-3 rounded mb-4" role="alert">
-            {{ message }}
-        </div>
+        {% include "components/molecules/alert.html" with type=message.tags message=message dismissible=False %}
         {% endfor %}
         {% endif %}
 
@@ -28,37 +26,13 @@
         <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
 
-            <div class="mb-6">
-                <label for="username" class="block text-gray-700 font-medium mb-2">Username</label>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    required
-                    autofocus
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter your username"
-                />
-            </div>
+            {% include "components/molecules/form_field.html" with label="Username" name="username" id="username" type="text" required=True placeholder="Enter your username" autocomplete="username" %}
 
-            <div class="mb-6">
-                <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter your password"
-                />
-            </div>
+            {% include "components/molecules/form_field.html" with label="Password" name="password" id="password" type="password" required=True placeholder="Enter your password" autocomplete="current-password" %}
 
-            <button
-                type="submit"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 transform hover:scale-105"
-            >
-                Sign In
-            </button>
+            <div class="mt-6">
+                {% include "components/atoms/button.html" with text="Sign In" type="submit" variant="primary" size="lg" full_width=True %}
+            </div>
         </form>
 
         <!-- Footer -->
