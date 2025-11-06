@@ -9,14 +9,7 @@
    - form_id: Form ID attribute (optional)
 #}
 
-{% with
-   form_action=action
-   form_method=method|default:"POST"
-   form_fields=fields
-   form_submit_text=submit_text|default:"Submit"
-   form_cancel_url=cancel_url|default:""
-   form_id=form_id|default:""
-%}
+{% with form_action=action form_method=method|default:"POST" form_fields=fields form_submit_text=submit_text|default:"Submit" form_cancel_url=cancel_url|default:"" form_id=form_id|default:"" %}
 
 <form action="{{ form_action }}" method="{{ form_method }}" {% if form_id %}id="{{ form_id }}"{% endif %} class="space-y-4">
    {% csrf_token %}

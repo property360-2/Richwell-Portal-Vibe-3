@@ -6,11 +6,7 @@
    - logout_url: Logout URL (optional)
 #}
 
-{% with
-   nav_brand=brand_text|default:"Richwell School Portal"
-   nav_user=user|default:request.user
-   nav_logout_url=logout_url|default:"logout"
-%}
+{% with nav_brand=brand_text|default:"Richwell School Portal" nav_user=user|default:request.user nav_logout_url=logout_url|default:"logout" %}
 
 <nav class="bg-blue-600 text-white shadow-lg">
    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

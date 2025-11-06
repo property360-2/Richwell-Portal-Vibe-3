@@ -1,0 +1,22 @@
+{# Molecule: Alert Component
+   Usage: {% include 'components/molecules/alert.html' with message='Success!' type='success' %}
+   Props:
+   - message: Alert message (required)
+   - type: success|error|warning|info (default: info)
+   - dismissible: boolean (default: False)
+   - title: Alert title (optional)
+#}
+
+{% with alert_message=message alert_type=type|default:"info" alert_dismissible=dismissible|default:False alert_title=title|default:"" %}
+
+{% if alert_type == 'success' %}
+   {% with color_classes="bg-green-100 border-green-400 text-green-700" %}{% include 'components/molecules/alert_inner.html' %}{% endwith %}
+{% elif alert_type == 'error' %}
+   {% with color_classes="bg-red-100 border-red-400 text-red-700" %}{% include 'components/molecules/alert_inner.html' %}{% endwith %}
+{% elif alert_type == 'warning' %}
+   {% with color_classes="bg-yellow-100 border-yellow-400 text-yellow-700" %}{% include 'components/molecules/alert_inner.html' %}{% endwith %}
+{% else %}
+   {% with color_classes="bg-blue-100 border-blue-400 text-blue-700" %}{% include 'components/molecules/alert_inner.html' %}{% endwith %}
+{% endif %}
+
+{% endwith %}

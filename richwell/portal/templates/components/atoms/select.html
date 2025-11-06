@@ -10,19 +10,9 @@
    - classes: Additional CSS classes (optional)
 #}
 
-{% with
-   select_name=name
-   select_options=options
-   select_selected=selected|default:""
-   select_id=id|default:name
-   select_required=required|default:False
-   select_disabled=disabled|default:False
-   select_classes=classes|default:""
-%}
-
 <select
    id="{{ select_id }}"
-   name="{{ select_name }}"
+   name="{{ name }}"
    {% if select_required %}required{% endif %}
    {% if select_disabled %}disabled{% endif %}
    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition {{ select_classes }} {% if select_disabled %}bg-gray-100 cursor-not-allowed{% endif %}"
@@ -33,5 +23,3 @@
    </option>
    {% endfor %}
 </select>
-
-{% endwith %}

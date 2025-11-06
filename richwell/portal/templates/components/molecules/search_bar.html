@@ -7,12 +7,7 @@
    - button_text: Search button text (default: 'Search')
 #}
 
-{% with
-   search_name=name|default:"search"
-   search_placeholder=placeholder|default:"Search..."
-   search_value=value|default:""
-   search_button_text=button_text|default:"Search"
-%}
+{% with search_name=name|default:"search" search_placeholder=placeholder|default:"Search..." search_value=value|default:"" search_button_text=button_text|default:"Search" %}
 
 <div class="flex gap-2">
    <div class="flex-1">

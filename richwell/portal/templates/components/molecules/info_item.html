@@ -7,12 +7,7 @@
    - badge_type: Type for value badge display (optional)
 #}
 
-{% with
-   info_label=label
-   info_value=value
-   info_icon=icon|default:""
-   info_badge_type=badge_type|default:""
-%}
+{% with info_label=label info_value=value info_icon=icon|default:"" info_badge_type=badge_type|default:"" %}
 
 <div>
    <p class="text-sm text-gray-600 mb-1">{{ info_label }}</p>

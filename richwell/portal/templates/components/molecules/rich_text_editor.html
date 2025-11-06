@@ -34,18 +34,7 @@
 {% load static %}
 
 {# Set defaults #}
-{% with
-  editor_id=id|default:name
-  editor_value=value|default:""
-  editor_placeholder=placeholder|default:"Start typing..."
-  editor_required=required|default:False
-  editor_disabled=disabled|default:False
-  editor_min_height=min_height|default:"md"
-  editor_error=error|default:""
-  editor_help=help_text|default:""
-  editor_toolbar=toolbar|default:True
-  editor_toolbar_items=toolbar_items|default:"bold,italic,underline,h2,h3,ul,ol,link"
-%}
+{% with editor_id=id|default:name editor_value=value|default:"" editor_placeholder=placeholder|default:"Start typing..." editor_required=required|default:False editor_disabled=disabled|default:False editor_min_height=min_height|default:"md" editor_error=error|default:"" editor_help=help_text|default:"" editor_toolbar=toolbar|default:True editor_toolbar_items=toolbar_items|default:"bold,italic,underline,h2,h3,ul,ol,link" %}
 
 
 <div

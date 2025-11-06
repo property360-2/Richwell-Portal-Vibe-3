@@ -5,10 +5,7 @@
    - links: List of footer links {text, href} (optional)
 #}
 
-{% with
-   footer_copyright=copyright_text|default:"© 2025 Richwell School Portal. All rights reserved."
-   footer_links=links|default:None
-%}
+{% with footer_copyright=copyright_text|default:"© 2025 Richwell School Portal. All rights reserved." footer_links=links|default:None %}
 
 <footer class="bg-white mt-12 py-6 border-t">
    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

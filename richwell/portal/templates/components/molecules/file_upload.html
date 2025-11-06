@@ -22,18 +22,7 @@
 {% load static %}
 
 {# Set defaults #}
-{% with
-  input_id=id|default:name
-  input_required=required|default:False
-  input_disabled=disabled|default:False
-  input_multiple=multiple|default:False
-  input_accept=accept|default:""
-  input_max_size=max_size_mb|default:10
-  input_error=error|default:""
-  input_help=help_text|default:""
-  show_preview=show_preview|default:True
-  existing_file=current_file|default:""
-%}
+{% with input_id=id|default:name input_required=required|default:False input_disabled=disabled|default:False input_multiple=multiple|default:False input_accept=accept|default:"" input_max_size=max_size_mb|default:10 input_error=error|default:"" input_help=help_text|default:"" show_preview=show_preview|default:True existing_file=current_file|default:"" %}
 
 <div
   class="w-full"

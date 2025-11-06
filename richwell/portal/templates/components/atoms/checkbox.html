@@ -18,14 +18,6 @@
        required=True %}
 #}
 
-{% with
-    checkbox_id=id|default:name
-    checkbox_value=value|default:"on"
-    checkbox_checked=checked|default:False
-    checkbox_disabled=disabled|default:False
-    checkbox_required=required|default:False
-%}
-
 <div class="flex items-start">
     <div class="flex items-center h-5">
         <input
@@ -58,5 +50,3 @@
     </div>
     {% endif %}
 </div>
-
-{% endwith %}

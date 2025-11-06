@@ -72,7 +72,8 @@ class Program(models.Model):
         ('Masteral', 'Masteral'),
     ]
 
-    name = models.CharField(max_length=255, help_text='Program name (e.g., BSCS, ABM)')
+    code = models.CharField(max_length=20, unique=True, help_text='Program code (e.g., BSCS, ABM)')
+    name = models.CharField(max_length=255, help_text='Program name (e.g., Bachelor of Science in Computer Science)')
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES)
     passing_grade = models.DecimalField(
         max_digits=3,
@@ -90,7 +91,7 @@ class Program(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return f"{self.name} ({self.get_level_display()})"
+        return f"{self.code} - {self.name}"
 
 
 # ===========================
@@ -164,6 +165,16 @@ class Subject(models.Model):
         max_digits=3,
         decimal_places=1,
         validators=[MinValueValidator(0.5), MaxValueValidator(10.0)]
+    )
+    lecture_hours = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(10)],
+        help_text='Number of lecture hours per week'
+    )
+    lab_hours = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(10)],
+        help_text='Number of lab hours per week'
     )
     type = models.CharField(
         max_length=10,
@@ -534,7 +545,28 @@ class Grade(models.Model):
     )
     grade = models.CharField(
         max_length=10,
-        help_text='e.g., "1.00", "1.75", "2.00", "3.00", "5.00", "INC"'
+        help_text='e.g., "1.00", "1.75", "2.00", "3.00", "5.00", "INC"',
+        blank=True,
+        null=True
+    )
+    numeric_grade = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        validators=[MinValueValidator(1.00), MaxValueValidator(5.00)],
+        help_text='Numeric grade from 1.00 to 5.00',
+        blank=True,
+        null=True
+    )
+    letter_grade = models.CharField(
+        max_length=5,
+        help_text='Letter grade (e.g., A, B+, C, F)',
+        blank=True,
+        null=True
+    )
+    remarks = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Additional remarks or comments'
     )
     posted_at = models.DateTimeField(auto_now_add=True)
 
@@ -549,11 +581,16 @@ class Grade(models.Model):
 
     def is_passing(self):
         """Check if grade is passing (≤ 3.00)"""
-        try:
-            grade_value = float(self.grade)
-            return grade_value <= 3.00
-        except ValueError:
-            return self.grade == 'INC' or self.grade.upper() == 'P'
+        # Try numeric_grade first, then fall back to grade field
+        if self.numeric_grade is not None:
+            return float(self.numeric_grade) <= 3.00
+        elif self.grade:
+            try:
+                grade_value = float(self.grade)
+                return grade_value <= 3.00
+            except ValueError:
+                return self.grade == 'INC' or self.grade.upper() == 'P'
+        return False
 
 
 # ===========================

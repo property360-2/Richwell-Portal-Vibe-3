@@ -33,14 +33,7 @@
 {% load static %}
 
 {# Set defaults #}
-{% with
-  wizard_id=id|default:"wizard"
-  wizard_steps=steps|default:list
-  wizard_show_progress=show_progress|default:True
-  wizard_show_numbers=show_step_numbers|default:True
-  wizard_allow_skip=allow_skip|default:False
-  wizard_linear=linear|default:True
-%}
+{% with wizard_id=id|default:"wizard" wizard_steps=steps|default:list wizard_show_progress=show_progress|default:True wizard_show_numbers=show_step_numbers|default:True wizard_allow_skip=allow_skip|default:False wizard_linear=linear|default:True %}
 
 <div
   x-data="{
