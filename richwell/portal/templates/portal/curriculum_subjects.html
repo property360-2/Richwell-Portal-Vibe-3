@@ -1,0 +1,91 @@
+{% extends 'portal/base.html' %}
+
+{% block title %}Curriculum Subjects - Richwell School Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="bg-white rounded-lg shadow-md">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Curriculum Subjects</h2>
+                    <p class="text-gray-600 mt-1">{{ curriculum.program.name }} - {{ curriculum.version }}</p>
+                    <p class="text-sm text-gray-500">Effective SY: {{ curriculum.effective_sy }}</p>
+                </div>
+                <div class="space-x-2">
+                    <a href="{% url 'curriculum_subject_add' curriculum.id %}"
+                       class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Add Subject
+                    </a>
+                    <a href="{% url 'curriculum_management' %}"
+                       class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subjects List -->
+        <div class="overflow-x-auto">
+            {% if curriculum_subjects %}
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject Code</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Units</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year Level</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Term</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recommended</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for cs in curriculum_subjects %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ cs.subject.code }}</td>
+                        <td class="px-6 py-4">{{ cs.subject.title }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ cs.subject.units }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">Year {{ cs.year_level }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">Term {{ cs.term_no }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if cs.is_recommended %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Yes</span>
+                            {% else %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">No</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{% url 'curriculum_subject_remove' cs.id %}" class="text-red-600 hover:text-red-900">Remove</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="px-6 py-12 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No subjects assigned</h3>
+                <p class="mt-1 text-sm text-gray-500">Add subjects to this curriculum.</p>
+                <div class="mt-6">
+                    <a href="{% url 'curriculum_subject_add' curriculum.id %}"
+                       class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        Add Subject
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if available_subjects %}
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 class="text-sm font-semibold text-blue-900 mb-2">Available Subjects</h4>
+        <p class="text-sm text-blue-700">{{ available_subjects.count }} subject(s) available to add to this curriculum.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
