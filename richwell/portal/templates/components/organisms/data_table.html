@@ -1,0 +1,50 @@
+{# Organism: Data Table Component
+   Usage: {% include 'components/organisms/data_table.html' with headers=headers rows=rows %}
+   Props:
+   - headers: List of header names (required)
+   - rows: List of row data (required) - each row is a list of cell data
+   - empty_message: Message when no data (default: 'No data available')
+   - striped: boolean - alternating row colors (default: False)
+   - hoverable: boolean - highlight on hover (default: True)
+#}
+
+{% with
+   table_headers=headers
+   table_rows=rows
+   table_empty=empty_message|default:"No data available"
+   table_striped=striped|default:False
+   table_hoverable=hoverable|default:True
+%}
+
+{% if table_rows %}
+<div class="overflow-x-auto">
+   <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+         <tr>
+            {% for header in table_headers %}
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+               {{ header }}
+            </th>
+            {% endfor %}
+         </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+         {% for row in table_rows %}
+         <tr class="{% if table_hoverable %}hover:bg-gray-50{% endif %} {% if table_striped and forloop.counter|divisibleby:2 %}bg-gray-50{% endif %}">
+            {% for cell in row %}
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+               {{ cell|safe }}
+            </td>
+            {% endfor %}
+         </tr>
+         {% endfor %}
+      </tbody>
+   </table>
+</div>
+{% else %}
+<div class="text-center py-8 text-gray-500">
+   <p>{{ table_empty }}</p>
+</div>
+{% endif %}
+
+{% endwith %}

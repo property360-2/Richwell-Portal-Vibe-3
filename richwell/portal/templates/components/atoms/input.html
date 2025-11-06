@@ -1,0 +1,36 @@
+{# Atom: Input Component
+   Usage: {% include 'components/atoms/input.html' with name='email' type='text' placeholder='Enter email' %}
+   Props:
+   - name: Input name attribute (required)
+   - type: text|email|password|number|date|tel (default: text)
+   - placeholder: Placeholder text (optional)
+   - value: Input value (optional)
+   - required: boolean (optional)
+   - disabled: boolean (optional)
+   - id: Input ID (optional, defaults to name)
+   - classes: Additional CSS classes (optional)
+#}
+
+{% with
+   input_name=name
+   input_type=type|default:"text"
+   input_placeholder=placeholder|default:""
+   input_value=value|default:""
+   input_id=id|default:name
+   input_required=required|default:False
+   input_disabled=disabled|default:False
+   input_classes=classes|default:""
+%}
+
+<input
+   type="{{ input_type }}"
+   id="{{ input_id }}"
+   name="{{ input_name }}"
+   {% if input_placeholder %}placeholder="{{ input_placeholder }}"{% endif %}
+   {% if input_value %}value="{{ input_value }}"{% endif %}
+   {% if input_required %}required{% endif %}
+   {% if input_disabled %}disabled{% endif %}
+   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition {{ input_classes }} {% if input_disabled %}bg-gray-100 cursor-not-allowed{% endif %}"
+/>
+
+{% endwith %}

@@ -1,0 +1,8 @@
+{# Badge Inner Template - Do not use directly #}
+{% if badge_size == 'sm' %}
+   {% with size_classes="px-2 py-0.5 text-xs" %}{% include 'components/atoms/badge_render.html' %}{% endwith %}
+{% elif badge_size == 'lg' %}
+   {% with size_classes="px-4 py-1.5 text-base" %}{% include 'components/atoms/badge_render.html' %}{% endwith %}
+{% else %}
+   {% with size_classes="px-2.5 py-1 text-sm" %}{% include 'components/atoms/badge_render.html' %}{% endwith %}
+{% endif %}

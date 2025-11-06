@@ -1,0 +1,51 @@
+{# Molecule: Form Field Component
+   Usage: {% include 'components/molecules/form_field.html' with label='Email' name='email' type='email' required=True %}
+   Props:
+   - label: Field label (required)
+   - name: Field name (required)
+   - type: text|email|password|number|date|tel|select|textarea (default: text)
+   - placeholder: Placeholder text (optional)
+   - value: Field value (optional)
+   - required: boolean (optional)
+   - disabled: boolean (optional)
+   - error: Error message (optional)
+   - help_text: Help text below field (optional)
+   - options: For select type - list of {value, label} (optional)
+   - rows: For textarea type - number of rows (optional)
+#}
+
+{% with
+   field_label=label
+   field_name=name
+   field_type=type|default:"text"
+   field_placeholder=placeholder|default:""
+   field_value=value|default:""
+   field_required=required|default:False
+   field_disabled=disabled|default:False
+   field_error=error|default:""
+   field_help=help_text|default:""
+   field_options=options|default:None
+   field_rows=rows|default:"4"
+%}
+
+<div class="mb-4">
+   {% include 'components/atoms/label.html' with text=field_label for=field_name required=field_required %}
+
+   {% if field_type == 'select' and field_options %}
+      {% include 'components/atoms/select.html' with name=field_name options=field_options selected=field_value required=field_required disabled=field_disabled %}
+   {% elif field_type == 'textarea' %}
+      {% include 'components/atoms/textarea.html' with name=field_name placeholder=field_placeholder value=field_value rows=field_rows required=field_required disabled=field_disabled %}
+   {% else %}
+      {% include 'components/atoms/input.html' with name=field_name type=field_type placeholder=field_placeholder value=field_value required=field_required disabled=field_disabled %}
+   {% endif %}
+
+   {% if field_error %}
+   <p class="mt-1 text-sm text-red-600">{{ field_error }}</p>
+   {% endif %}
+
+   {% if field_help %}
+   <p class="mt-1 text-sm text-gray-500">{{ field_help }}</p>
+   {% endif %}
+</div>
+
+{% endwith %}

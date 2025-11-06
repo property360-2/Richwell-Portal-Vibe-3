@@ -1,0 +1,39 @@
+{# Organism: Form Component
+   Usage: {% include 'components/organisms/form.html' with action='/submit' method='POST' fields=form_fields %}
+   Props:
+   - action: Form action URL (required)
+   - method: GET|POST (default: POST)
+   - fields: List of field configs (required) - each field should have properties for form_field molecule
+   - submit_text: Submit button text (default: 'Submit')
+   - cancel_url: Cancel button URL (optional)
+   - form_id: Form ID attribute (optional)
+#}
+
+{% with
+   form_action=action
+   form_method=method|default:"POST"
+   form_fields=fields
+   form_submit_text=submit_text|default:"Submit"
+   form_cancel_url=cancel_url|default:""
+   form_id=form_id|default:""
+%}
+
+<form action="{{ form_action }}" method="{{ form_method }}" {% if form_id %}id="{{ form_id }}"{% endif %} class="space-y-4">
+   {% csrf_token %}
+
+   {% for field in form_fields %}
+      {% include 'components/molecules/form_field.html' with label=field.label name=field.name type=field.type|default:'text' placeholder=field.placeholder|default:'' value=field.value|default:'' required=field.required|default:False error=field.error|default:'' help_text=field.help_text|default:'' options=field.options|default:None rows=field.rows|default:'4' %}
+   {% endfor %}
+
+   <div class="flex gap-3 pt-4">
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition font-medium">
+         {{ form_submit_text }}
+      </button>
+
+      {% if form_cancel_url %}
+      {% include 'components/atoms/button.html' with text='Cancel' href=form_cancel_url type='secondary' %}
+      {% endif %}
+   </div>
+</form>
+
+{% endwith %}

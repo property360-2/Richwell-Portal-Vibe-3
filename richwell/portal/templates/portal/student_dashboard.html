@@ -5,42 +5,27 @@
 {% block content %}
 <div class="space-y-6">
 
-    <!-- Header -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-3xl font-bold text-gray-800">Student Dashboard</h2>
-        <p class="text-gray-600 mt-2">Welcome, {{ student.user.get_full_name }}!</p>
-    </div>
+    {# Page Header - Using Organism Component #}
+    {% include 'components/organisms/page_header.html' with title='Student Dashboard' subtitle=student.user.get_full_name %}
 
-    <!-- Student Info Card -->
+    {# Student Info Card - Using Organism Component #}
     <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-xl font-semibold mb-4">Student Information</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <p class="text-sm text-gray-600">Student ID</p>
-                <p class="font-semibold">{{ student.user.username }}</p>
-            </div>
-            <div>
-                <p class="text-sm text-gray-600">Program</p>
-                <p class="font-semibold">{{ student.program.name }}</p>
-            </div>
-            <div>
-                <p class="text-sm text-gray-600">Curriculum</p>
-                <p class="font-semibold">{{ student.curriculum.version }}</p>
-            </div>
-            <div>
-                <p class="text-sm text-gray-600">Status</p>
-                <p class="font-semibold capitalize">{{ student.status }}</p>
-            </div>
+            {% include 'components/molecules/info_item.html' with label='Student ID' value=student.user.username %}
+            {% include 'components/molecules/info_item.html' with label='Program' value=student.program.name %}
+            {% include 'components/molecules/info_item.html' with label='Curriculum' value=student.curriculum.version %}
+            {% include 'components/molecules/info_item.html' with label='Status' value=student.status|capfirst badge_type='info' %}
             {% if gpa %}
             <div>
-                <p class="text-sm text-gray-600">GPA</p>
+                <p class="text-sm text-gray-600 mb-1">GPA</p>
                 <p class="font-semibold text-2xl text-blue-600">{{ gpa|floatformat:2 }}</p>
             </div>
             {% endif %}
         </div>
     </div>
 
-    <!-- Current Term Enrollments -->
+    {# Current Term Enrollments #}
     <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-xl font-semibold mb-4">Current Enrollments{% if active_term %} - {{ active_term.name }}{% endif %}</h3>
 
@@ -59,7 +44,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for enrollment in current_enrollments %}
-                    <tr>
+                    <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {{ enrollment.subject.code }}
                         </td>
@@ -76,14 +61,18 @@
                             {{ enrollment.subject.units }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                                {% if enrollment.status == 'enrolled' %}bg-green-100 text-green-800
-                                {% elif enrollment.status == 'completed' %}bg-blue-100 text-blue-800
-                                {% elif enrollment.status == 'failed' %}bg-red-100 text-red-800
-                                {% elif enrollment.status == 'inc' %}bg-yellow-100 text-yellow-800
-                                {% else %}bg-gray-100 text-gray-800{% endif %}">
-                                {{ enrollment.status|upper }}
-                            </span>
+                            {# Using Badge Atom Component #}
+                            {% if enrollment.status == 'enrolled' %}
+                                {% include 'components/atoms/badge.html' with text=enrollment.status|upper type='success' size='sm' %}
+                            {% elif enrollment.status == 'completed' %}
+                                {% include 'components/atoms/badge.html' with text=enrollment.status|upper type='info' size='sm' %}
+                            {% elif enrollment.status == 'failed' %}
+                                {% include 'components/atoms/badge.html' with text=enrollment.status|upper type='danger' size='sm' %}
+                            {% elif enrollment.status == 'inc' %}
+                                {% include 'components/atoms/badge.html' with text=enrollment.status|upper type='warning' size='sm' %}
+                            {% else %}
+                                {% include 'components/atoms/badge.html' with text=enrollment.status|upper type='default' size='sm' %}
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -92,17 +81,17 @@
         </div>
         {% else %}
         <div class="text-center py-8 text-gray-500">
-            <p>No enrollments for the current term.</p>
+            <p class="mb-4">No enrollments for the current term.</p>
             {% if active_term %}
-            <a href="{% url 'enrollment' %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition">
-                Enroll in Subjects
-            </a>
+            {# Using Button Atom Component #}
+            {% url 'enrollment' as enrollment_url %}
+            {% include 'components/atoms/button.html' with text='Enroll in Subjects' href=enrollment_url type='primary' %}
             {% endif %}
         </div>
         {% endif %}
     </div>
 
-    <!-- Grades & Transcript -->
+    {# Grades & Transcript #}
     <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-xl font-semibold mb-4">Grade History</h3>
 
@@ -122,7 +111,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for grade_record in all_grades %}
-                    <tr>
+                    <tr class="hover:bg-gray-50 {% if forloop.counter|divisibleby:2 %}bg-gray-50{% endif %}">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ grade_record.student_subject.term.name }}
                         </td>
