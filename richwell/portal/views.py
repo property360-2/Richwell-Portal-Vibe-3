@@ -2275,3 +2275,127 @@ def inc_grade_tracking(request):
     }
 
     return render(request, 'portal/inc_grade_tracking.html', context)
+
+
+# ===========================
+# EXPORT VIEWS
+# ===========================
+
+from .exports import PDFExporter, CSVExporter, ExcelExporter
+
+
+@login_required
+@student_required
+def export_cor_pdf(request):
+    """Export Certificate of Registration as PDF."""
+    student = request.user.student_profile
+    term = TermService.get_active_term()
+
+    if not term:
+        messages.error(request, 'No active term found.')
+        return redirect('student_dashboard')
+
+    return PDFExporter.generate_cor(student, term)
+
+
+@login_required
+@professor_required
+def export_section_roster_pdf(request, section_id):
+    """Export section roster as PDF."""
+    section = get_object_or_404(Section, id=section_id)
+
+    # Verify professor is assigned to this section
+    if section.professor != request.user:
+        messages.error(request, 'You are not assigned to this section.')
+        return redirect('professor_dashboard')
+
+    return PDFExporter.generate_section_roster(section)
+
+
+@login_required
+@professor_required
+def export_section_grades_csv(request, section_id):
+    """Export section grades as CSV."""
+    section = get_object_or_404(Section, id=section_id)
+
+    # Verify professor is assigned to this section
+    if section.professor != request.user:
+        messages.error(request, 'You are not assigned to this section.')
+        return redirect('professor_dashboard')
+
+    return CSVExporter.export_grades(section)
+
+
+@login_required
+@professor_required
+def export_section_grades_excel(request, section_id):
+    """Export section grades as Excel."""
+    section = get_object_or_404(Section, id=section_id)
+
+    # Verify professor is assigned to this section
+    if section.professor != request.user:
+        messages.error(request, 'You are not assigned to this section.')
+        return redirect('professor_dashboard')
+
+    return ExcelExporter.export_grades_excel(section)
+
+
+@login_required
+@registrar_required
+def export_enrollment_report_csv(request):
+    """Export enrollment report as CSV."""
+    term = TermService.get_active_term()
+
+    if not term:
+        messages.error(request, 'No active term found.')
+        return redirect('registrar_dashboard')
+
+    return CSVExporter.export_enrollment_report(term)
+
+
+# ===========================
+# PASSWORD MANAGEMENT VIEWS
+# ===========================
+
+from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
+from django.contrib.auth import update_session_auth_hash
+
+
+@login_required
+def change_password(request):
+    """Allow users to change their password."""
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Keep user logged in
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = PasswordChangeForm(request.user)
+
+    return render(request, 'portal/change_password.html', {'form': form})
+
+
+@login_required
+@admin_required
+def reset_user_password(request, user_id):
+    """Admin can reset any user's password."""
+    user_to_reset = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        # Generate temporary password
+        import secrets
+        import string
+        temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
+
+        # Set the password
+        user_to_reset.set_password(temp_password)
+        user_to_reset.save()
+
+        messages.success(request, f'Password reset for {user_to_reset.username}. Temporary password: {temp_password}')
+        return redirect('dashboard')
+
+    return render(request, 'portal/reset_user_password.html', {'user_to_reset': user_to_reset})
