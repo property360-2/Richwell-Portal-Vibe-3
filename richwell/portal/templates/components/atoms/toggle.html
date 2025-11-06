@@ -1,0 +1,51 @@
+{# Toggle Switch Atom Component
+
+   Props:
+   - name: Field name (required)
+   - id: Toggle ID (defaults to name)
+   - checked: Whether toggle is on (boolean)
+   - label: Label text for the toggle
+   - disabled: Whether toggle is disabled (boolean)
+   - size: Size variant (sm, md, lg) - defaults to md
+   - description: Description text below label
+   - on_label: Text to show when toggle is ON (optional)
+   - off_label: Text to show when toggle is OFF (optional)
+
+   Usage:
+   {% include 'components/atoms/toggle.html'
+       with name='notifications'
+       label='Enable Notifications'
+       checked=True %}
+
+   {% include 'components/atoms/toggle.html'
+       with name='dark_mode'
+       label='Dark Mode'
+       size='lg'
+       on_label='On'
+       off_label='Off' %}
+#}
+
+{% with
+    toggle_id=id|default:name
+    toggle_checked=checked|default:False
+    toggle_disabled=disabled|default:False
+    toggle_size=size|default:"md"
+%}
+
+{# Size configurations #}
+{% if toggle_size == 'sm' %}
+    {% with toggle_width="w-9" toggle_height="h-5" dot_size="h-4 w-4" dot_translate="translate-x-4" %}
+        {% include 'components/atoms/toggle_inner.html' %}
+    {% endwith %}
+{% elif toggle_size == 'lg' %}
+    {% with toggle_width="w-14" toggle_height="h-7" dot_size="h-6 w-6" dot_translate="translate-x-7" %}
+        {% include 'components/atoms/toggle_inner.html' %}
+    {% endwith %}
+{% else %}
+    {# Default md size #}
+    {% with toggle_width="w-11" toggle_height="h-6" dot_size="h-5 w-5" dot_translate="translate-x-5" %}
+        {% include 'components/atoms/toggle_inner.html' %}
+    {% endwith %}
+{% endif %}
+
+{% endwith %}

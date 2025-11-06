@@ -5,17 +5,15 @@
 {% block content %}
 <div class="space-y-6">
 
-    <!-- Header -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-3xl font-bold text-gray-800">Admission Dashboard</h2>
-        <p class="text-gray-600 mt-2">Process applications and manage new students</p>
-    </div>
+    {# Page Header #}
+    {% include 'components/organisms/page_header.html'
+        with title='Admission Dashboard'
+        subtitle='Process applications and manage new students' %}
 
-    <!-- Program Statistics -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-xl font-semibold mb-4">Students by Program</h3>
-
-        {% if program_stats %}
+    {# Program Statistics #}
+    {% if program_stats %}
+    {% include 'components/molecules/card.html' with title='Students by Program' shadow='md' %}
+    <div class="bg-white rounded-lg shadow-md p-6 -mt-6">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {% for program in program_stats %}
             <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
@@ -28,16 +26,23 @@
             </div>
             {% endfor %}
         </div>
-        {% else %}
+    </div>
+    {% else %}
+    {% include 'components/molecules/card.html'
+        with title='Students by Program'
+        shadow='md' %}
+    <div class="bg-white rounded-lg shadow-md p-6 -mt-6">
         <div class="text-center py-8 text-gray-500">
             <p>No programs found.</p>
         </div>
-        {% endif %}
     </div>
+    {% endif %}
 
-    <!-- Recent Students -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-xl font-semibold mb-4">Recently Added Students</h3>
+    {# Recent Students Table #}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Recently Added Students</h3>
+        </div>
 
         {% if recent_students %}
         <div class="overflow-x-auto">
@@ -55,7 +60,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for student in recent_students %}
-                    <tr>
+                    <tr class="hover:bg-gray-100 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ student.created_at|date:"M d, Y" }}
                         </td>
@@ -72,12 +77,13 @@
                             {{ student.curriculum.version }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                                {% if student.status == 'active' %}bg-green-100 text-green-800
-                                {% elif student.status == 'inactive' %}bg-yellow-100 text-yellow-800
-                                {% else %}bg-gray-100 text-gray-800{% endif %}">
-                                {{ student.status|upper }}
-                            </span>
+                            {% if student.status == 'active' %}
+                                {% include 'components/atoms/badge.html' with text='ACTIVE' type='success' size='sm' %}
+                            {% elif student.status == 'inactive' %}
+                                {% include 'components/atoms/badge.html' with text='INACTIVE' type='warning' size='sm' %}
+                            {% else %}
+                                {% include 'components/atoms/badge.html' with text='UNKNOWN' type='default' size='sm' %}
+                            {% endif %}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <a href="/admin/portal/student/{{ student.id }}/change/" class="text-blue-600 hover:text-blue-900">
@@ -96,19 +102,25 @@
         {% endif %}
     </div>
 
-    <!-- Quick Actions -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-xl font-semibold mb-4">Quick Actions</h3>
+    {# Quick Actions #}
+    {% include 'components/molecules/card.html' with title='Quick Actions' shadow='md' %}
+    <div class="bg-white rounded-lg shadow-md p-6 -mt-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <a href="/admin/portal/user/add/" class="block bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-4 rounded-lg transition">
-                Create New User
-            </a>
-            <a href="/admin/portal/student/add/" class="block bg-green-600 hover:bg-green-700 text-white text-center px-6 py-4 rounded-lg transition">
-                Add New Student
-            </a>
-            <a href="/admin/portal/student/" class="block bg-purple-600 hover:bg-purple-700 text-white text-center px-6 py-4 rounded-lg transition">
-                View All Students
-            </a>
+            {% include 'components/atoms/button.html'
+                with text='Create New User'
+                href='/admin/portal/user/add/'
+                type='primary'
+                size='lg' %}
+            {% include 'components/atoms/button.html'
+                with text='Add New Student'
+                href='/admin/portal/student/add/'
+                type='success'
+                size='lg' %}
+            {% include 'components/atoms/button.html'
+                with text='View All Students'
+                href='/admin/portal/student/'
+                type='secondary'
+                size='lg' %}
         </div>
     </div>
 

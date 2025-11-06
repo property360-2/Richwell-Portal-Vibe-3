@@ -5,42 +5,46 @@
 {% block content %}
 <div class="space-y-6">
 
-    <!-- Header -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-3xl font-bold text-gray-800">Dean Dashboard</h2>
-        <p class="text-gray-600 mt-2">Program analytics and academic oversight</p>
-    </div>
+    {# Page Header #}
+    {% include 'components/organisms/page_header.html'
+        with title='Dean Dashboard'
+        subtitle='Program analytics and academic oversight' %}
 
-    <!-- Statistics Card -->
+    {# Statistics Cards #}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow p-6 text-white">
-            <div class="text-sm mb-2 opacity-90">Total Active Students</div>
-            <div class="text-4xl font-bold">{{ total_students }}</div>
-        </div>
-        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow p-6 text-white">
-            <div class="text-sm mb-2 opacity-90">Total Programs</div>
-            <div class="text-4xl font-bold">{{ programs|length }}</div>
-        </div>
-        <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg shadow p-6 text-white">
-            <div class="text-sm mb-2 opacity-90">INC Grades Pending</div>
-            <div class="text-4xl font-bold">{{ inc_grades|length }}</div>
-        </div>
+        {% include 'components/molecules/stat_card.html'
+            with label='Total Active Students'
+            value=total_students
+            icon='👥' %}
+
+        {% include 'components/molecules/stat_card.html'
+            with label='Total Programs'
+            value=programs|length
+            icon='🎓' %}
+
+        {% include 'components/molecules/stat_card.html'
+            with label='INC Grades Pending'
+            value=inc_grades|length
+            icon='⚠️'
+            trend='down' %}
     </div>
 
-    <!-- Active Term Info -->
+    {# Active Term Info #}
     {% if active_term %}
-    <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-xl font-semibold mb-2">Current Academic Term</h3>
-        <p class="text-gray-700">{{ active_term.name }}</p>
+    {% include 'components/molecules/card.html' with title='Current Academic Term' shadow='md' %}
+    <div class="bg-white rounded-lg shadow-md p-6 -mt-6">
+        <p class="text-gray-700 font-semibold">{{ active_term.name }}</p>
         <p class="text-sm text-gray-600 mt-1">
             {{ active_term.start_date|date:"M d, Y" }} - {{ active_term.end_date|date:"M d, Y" }}
         </p>
     </div>
     {% endif %}
 
-    <!-- Program Statistics -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-xl font-semibold mb-4">Programs Overview</h3>
+    {# Programs Overview Table #}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Programs Overview</h3>
+        </div>
 
         {% if programs %}
         <div class="overflow-x-auto">
@@ -56,7 +60,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for program in programs %}
-                    <tr>
+                    <tr class="hover:bg-gray-100 transition-colors">
                         <td class="px-6 py-4 text-sm font-medium text-gray-900">
                             {{ program.name }}
                         </td>
@@ -86,9 +90,11 @@
         {% endif %}
     </div>
 
-    <!-- INC Grades Needing Review -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-xl font-semibold mb-4">Incomplete (INC) Grades</h3>
+    {# INC Grades Table #}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Incomplete (INC) Grades</h3>
+        </div>
 
         {% if inc_grades %}
         <div class="overflow-x-auto">
@@ -104,7 +110,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for grade in inc_grades %}
-                    <tr>
+                    <tr class="hover:bg-gray-100 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ grade.student_subject.student.user.get_full_name }}
                         </td>
@@ -135,22 +141,30 @@
         {% endif %}
     </div>
 
-    <!-- Quick Actions -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-xl font-semibold mb-4">Quick Actions</h3>
+    {# Quick Actions #}
+    {% include 'components/molecules/card.html' with title='Quick Actions' shadow='md' %}
+    <div class="bg-white rounded-lg shadow-md p-6 -mt-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <a href="/admin/portal/program/" class="block bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-4 rounded-lg transition">
-                Manage Programs
-            </a>
-            <a href="/admin/portal/curriculum/" class="block bg-green-600 hover:bg-green-700 text-white text-center px-6 py-4 rounded-lg transition">
-                Manage Curricula
-            </a>
-            <a href="/admin/portal/subject/" class="block bg-purple-600 hover:bg-purple-700 text-white text-center px-6 py-4 rounded-lg transition">
-                Manage Subjects
-            </a>
-            <a href="/admin/portal/grade/" class="block bg-yellow-600 hover:bg-yellow-700 text-white text-center px-6 py-4 rounded-lg transition">
-                View All Grades
-            </a>
+            {% include 'components/atoms/button.html'
+                with text='Manage Programs'
+                href='/admin/portal/program/'
+                type='primary'
+                size='md' %}
+            {% include 'components/atoms/button.html'
+                with text='Manage Curricula'
+                href='/admin/portal/curriculum/'
+                type='success'
+                size='md' %}
+            {% include 'components/atoms/button.html'
+                with text='Manage Subjects'
+                href='/admin/portal/subject/'
+                type='secondary'
+                size='md' %}
+            {% include 'components/atoms/button.html'
+                with text='View All Grades'
+                href='/admin/portal/grade/'
+                type='warning'
+                size='md' %}
         </div>
     </div>
 
