@@ -92,7 +92,7 @@ class EnrollmentServiceTests(TestCase):
         # Create prerequisite
         Prerequisite.objects.create(
             subject=self.subject2,
-            prerequisite_subject=self.subject1
+            prereq_subject=self.subject1
         )
 
         # Create sections
@@ -117,7 +117,7 @@ class EnrollmentServiceTests(TestCase):
         # Create settings
         Setting.objects.create(key_name='enrollment_open', value_text='true')
         Setting.objects.create(key_name='freshman_unit_cap', value_text='30')
-        Setting.objects.create(key='passing_grade', value='3.0')
+        Setting.objects.create(key_name='passing_grade', value_text='3.0')
 
     def test_validate_enrollment_success(self):
         """Test successful enrollment validation."""
@@ -221,6 +221,7 @@ class GradeServiceTests(TestCase):
             subject=self.subject,
             section=self.section,
             term=self.term,
+            professor=self.professor_user,
             status='enrolled'
         )
 
@@ -320,8 +321,7 @@ class SectionServiceTests(TestCase):
         self.student = Student.objects.create(
             user=student_user,
             program=program,
-            curriculum=curriculum,
-            year_level=1
+            curriculum=curriculum
         )
 
         # Create professor
@@ -375,6 +375,7 @@ class SectionServiceTests(TestCase):
             subject=self.section.subject,
             section=self.section,
             term=self.section.term,
+            professor=self.section.professor,
             status='enrolled'
         )
 
