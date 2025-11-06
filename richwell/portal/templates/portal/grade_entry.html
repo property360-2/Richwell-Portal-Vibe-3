@@ -1,0 +1,72 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Enter Grade - Richwell School Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-3xl font-bold text-gray-800">Enter/Update Grade</h2>
+    </div>
+
+    <!-- Student Info -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-xl font-semibold mb-4">Student Information</h3>
+        <div class="space-y-2">
+            <p><strong>Student:</strong> {{ enrollment.student.user.get_full_name }}</p>
+            <p><strong>Student ID:</strong> {{ enrollment.student.user.username }}</p>
+            <p><strong>Subject:</strong> {{ enrollment.subject.code }} - {{ enrollment.subject.title }}</p>
+            <p><strong>Section:</strong> {{ enrollment.section.section_code }}</p>
+            <p><strong>Term:</strong> {{ enrollment.term.name }}</p>
+            <p><strong>Units:</strong> {{ enrollment.subject.units }}</p>
+        </div>
+    </div>
+
+    <!-- Grade Entry Form -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-xl font-semibold mb-4">Grade Entry</h3>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-6">
+                <label for="id_grade" class="block text-gray-700 font-medium mb-2">
+                    Select Grade
+                </label>
+                {{ form.grade }}
+                {% if form.grade.errors %}
+                <div class="mt-2 text-red-600 text-sm">
+                    {{ form.grade.errors }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="flex gap-4">
+                <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded transition">
+                    Save Grade
+                </button>
+                <a href="{% url 'section_students' enrollment.section.id %}"
+                   class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded transition inline-block">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Grade Information -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h4 class="font-semibold text-blue-800 mb-2">Grade Scale Information</h4>
+        <div class="text-sm text-blue-700 space-y-1">
+            <p><strong>1.00 - 3.00:</strong> Passing grades</p>
+            <p><strong>4.00:</strong> Conditional (student must repeat)</p>
+            <p><strong>5.00:</strong> Failed</p>
+            <p><strong>INC:</strong> Incomplete (student has {{ enrollment.subject.get_inc_deadline_months }} months to complete)</p>
+            <p><strong>DRP:</strong> Dropped</p>
+            <p><strong>P:</strong> Passed (for pass/fail courses)</p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
