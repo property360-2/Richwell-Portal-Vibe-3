@@ -5,14 +5,17 @@
 {% block content %}
 <div class="space-y-6">
 
-    <!-- Header -->
+    <!-- Page Header -->
+    {% include "components/organisms/page_header.html" with title=section.section_code subtitle=section.subject.title %}
+
+    <!-- Section Information -->
     <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-3xl font-bold text-gray-800">{{ section.section_code }}</h2>
-        <p class="text-xl text-gray-700 mt-2">{{ section.subject.title }}</p>
-        <p class="text-gray-600">{{ section.subject.code }} - {{ section.term.name }}</p>
-        <p class="text-sm text-gray-500 mt-2">
-            Enrolled: {{ enrollment_list|length }} / {{ section.capacity }}
-        </p>
+        <h3 class="text-lg font-semibold mb-4">Section Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {% include "components/molecules/info_item.html" with label="Subject Code" value=section.subject.code %}
+            {% include "components/molecules/info_item.html" with label="Term" value=section.term.name %}
+            {% include "components/molecules/info_item.html" with label="Enrollment" value=enrollment_list|length|stringformat:"d"|add:" / "|add:section.capacity|stringformat:"d" %}
+        </div>
     </div>
 
     <!-- Students Table -->
@@ -56,18 +59,20 @@
                             {% endif %}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                                {% if item.enrollment.status == 'enrolled' %}bg-green-100 text-green-800
-                                {% elif item.enrollment.status == 'completed' %}bg-blue-100 text-blue-800
-                                {% else %}bg-gray-100 text-gray-800{% endif %}">
-                                {{ item.enrollment.status|upper }}
-                            </span>
+                            {% if item.enrollment.status == 'enrolled' %}
+                                {% include "components/atoms/badge.html" with text="ENROLLED" variant="success" %}
+                            {% elif item.enrollment.status == 'completed' %}
+                                {% include "components/atoms/badge.html" with text="COMPLETED" variant="primary" %}
+                            {% else %}
+                                {% include "components/atoms/badge.html" with text=item.enrollment.status|upper variant="default" %}
+                            {% endif %}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="{% url 'grade_student' item.enrollment.id %}"
-                               class="text-blue-600 hover:text-blue-900">
-                                {% if item.grade %}Edit Grade{% else %}Enter Grade{% endif %}
-                            </a>
+                            {% if item.grade %}
+                                <a href="{% url 'grade_student' item.enrollment.id %}" class="text-blue-600 hover:text-blue-900 font-medium">Edit Grade</a>
+                            {% else %}
+                                <a href="{% url 'grade_student' item.enrollment.id %}" class="text-blue-600 hover:text-blue-900 font-medium">Enter Grade</a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -81,7 +86,7 @@
 
     <!-- Back Button -->
     <div>
-        <a href="{% url 'professor_dashboard' %}" class="inline-block bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded transition">
+        <a href="{% url 'professor_dashboard' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
             Back to Dashboard
         </a>
     </div>

@@ -5,21 +5,19 @@
 {% block content %}
 <div class="max-w-2xl mx-auto space-y-6">
 
-    <!-- Header -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-3xl font-bold text-gray-800">Enter/Update Grade</h2>
-    </div>
+    <!-- Page Header -->
+    {% include "components/organisms/page_header.html" with title="Enter/Update Grade" subtitle="Grade Management" %}
 
-    <!-- Student Info -->
+    <!-- Student Information -->
     <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-xl font-semibold mb-4">Student Information</h3>
-        <div class="space-y-2">
-            <p><strong>Student:</strong> {{ enrollment.student.user.get_full_name }}</p>
-            <p><strong>Student ID:</strong> {{ enrollment.student.user.username }}</p>
-            <p><strong>Subject:</strong> {{ enrollment.subject.code }} - {{ enrollment.subject.title }}</p>
-            <p><strong>Section:</strong> {{ enrollment.section.section_code }}</p>
-            <p><strong>Term:</strong> {{ enrollment.term.name }}</p>
-            <p><strong>Units:</strong> {{ enrollment.subject.units }}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% include "components/molecules/info_item.html" with label="Student" value=enrollment.student.user.get_full_name %}
+            {% include "components/molecules/info_item.html" with label="Student ID" value=enrollment.student.user.username %}
+            {% include "components/molecules/info_item.html" with label="Subject" value=enrollment.subject.code|add:" - "|add:enrollment.subject.title %}
+            {% include "components/molecules/info_item.html" with label="Section" value=enrollment.section.section_code %}
+            {% include "components/molecules/info_item.html" with label="Term" value=enrollment.term.name %}
+            {% include "components/molecules/info_item.html" with label="Units" value=enrollment.subject.units %}
         </div>
     </div>
 
@@ -31,24 +29,18 @@
             {% csrf_token %}
 
             <div class="mb-6">
-                <label for="id_grade" class="block text-gray-700 font-medium mb-2">
+                <label for="id_grade" class="block text-sm font-medium text-gray-700 mb-2">
                     Select Grade
                 </label>
                 {{ form.grade }}
                 {% if form.grade.errors %}
-                <div class="mt-2 text-red-600 text-sm">
-                    {{ form.grade.errors }}
-                </div>
+                <p class="mt-2 text-sm text-red-600">{{ form.grade.errors.0 }}</p>
                 {% endif %}
             </div>
 
             <div class="flex gap-4">
-                <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded transition">
-                    Save Grade
-                </button>
-                <a href="{% url 'section_students' enrollment.section.id %}"
-                   class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded transition inline-block">
+                {% include "components/atoms/button.html" with text="Save Grade" type="submit" variant="primary" size="lg" %}
+                <a href="{% url 'section_students' enrollment.section.id %}" class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Cancel
                 </a>
             </div>
@@ -62,7 +54,7 @@
             <p><strong>1.00 - 3.00:</strong> Passing grades</p>
             <p><strong>4.00:</strong> Conditional (student must repeat)</p>
             <p><strong>5.00:</strong> Failed</p>
-            <p><strong>INC:</strong> Incomplete (student has {{ enrollment.subject.get_inc_deadline_months }} months to complete)</p>
+            <p><strong>INC:</strong> Incomplete</p>
             <p><strong>DRP:</strong> Dropped</p>
             <p><strong>P:</strong> Passed (for pass/fail courses)</p>
         </div>
