@@ -4,6 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
 from django.db import models
+from .decorators import (
+    student_required, professor_required, registrar_required,
+    dean_required, admission_staff_required, admin_required
+)
 
 
 def login_view(request):
