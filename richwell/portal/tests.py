@@ -115,7 +115,7 @@ class ModelTests(TestCase):
         self.assertEqual(self.admin_user.role, 'admin')
         self.assertEqual(self.student_user.role, 'student')
         self.assertEqual(self.professor_user.role, 'professor')
-        self.assertTrue(self.admin_user.is_admin())
+        self.assertTrue(self.admin_user.is_admin_user())
         self.assertTrue(self.student_user.is_student())
         self.assertTrue(self.professor_user.is_professor())
 
