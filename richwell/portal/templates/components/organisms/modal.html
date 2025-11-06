@@ -39,19 +39,6 @@
   modal_secondary_action=secondary_button_action|default:""
 %}
 
-{# Size classes #}
-{% if modal_size == "sm" %}
-  {% with modal_width="max-w-sm" %}
-{% elif modal_size == "lg" %}
-  {% with modal_width="max-w-4xl" %}
-{% elif modal_size == "xl" %}
-  {% with modal_width="max-w-6xl" %}
-{% elif modal_size == "full" %}
-  {% with modal_width="max-w-screen-2xl w-11/12" %}
-{% else %}
-  {% with modal_width="max-w-2xl" %}
-{% endif %}
-
 <div
   x-data="{
     open: false,
@@ -105,7 +92,7 @@
         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
         @click.stop
-        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all w-full {{ modal_width }}"
+        class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all w-full {% if modal_size == 'sm' %}max-w-sm{% elif modal_size == 'lg' %}max-w-4xl{% elif modal_size == 'xl' %}max-w-6xl{% elif modal_size == 'full' %}max-w-screen-2xl w-11/12{% else %}max-w-2xl{% endif %}"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-{{ modal_id }}-title"
@@ -184,5 +171,4 @@
   </div>
 </div>
 
-{% endwith %}
 {% endwith %}
