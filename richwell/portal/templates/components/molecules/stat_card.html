@@ -1,0 +1,44 @@
+{# Molecule: Stat Card Component
+   Usage: {% include 'components/molecules/stat_card.html' with label='Total Students' value='1,234' %}
+   Props:
+   - label: Stat label (required)
+   - value: Stat value (required)
+   - icon: Icon HTML (optional)
+   - change: Percentage change (optional)
+   - change_type: up|down (optional)
+   - color: primary|success|danger|warning (default: primary)
+#}
+
+{% with
+   stat_label=label
+   stat_value=value
+   stat_icon=icon|default:""
+   stat_change=change|default:""
+   stat_change_type=change_type|default:""
+   stat_color=color|default:"primary"
+%}
+
+<div class="bg-white rounded-lg shadow p-6">
+   <div class="flex items-center justify-between">
+      <div>
+         <p class="text-sm text-gray-600 mb-1">{{ stat_label }}</p>
+         <p class="text-3xl font-bold {% if stat_color == 'success' %}text-green-600{% elif stat_color == 'danger' %}text-red-600{% elif stat_color == 'warning' %}text-yellow-600{% else %}text-blue-600{% endif %}">
+            {{ stat_value }}
+         </p>
+
+         {% if stat_change %}
+         <p class="text-sm mt-2 {% if stat_change_type == 'up' %}text-green-600{% else %}text-red-600{% endif %}">
+            {% if stat_change_type == 'up' %}↑{% else %}↓{% endif %} {{ stat_change }}
+         </p>
+         {% endif %}
+      </div>
+
+      {% if stat_icon %}
+      <div class="text-4xl {% if stat_color == 'success' %}text-green-600{% elif stat_color == 'danger' %}text-red-600{% elif stat_color == 'warning' %}text-yellow-600{% else %}text-blue-600{% endif %} opacity-50">
+         {{ stat_icon|safe }}
+      </div>
+      {% endif %}
+   </div>
+</div>
+
+{% endwith %}

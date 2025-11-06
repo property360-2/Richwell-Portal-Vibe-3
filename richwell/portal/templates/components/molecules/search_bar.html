@@ -1,0 +1,26 @@
+{# Molecule: Search Bar Component
+   Usage: {% include 'components/molecules/search_bar.html' with placeholder='Search...' name='search' %}
+   Props:
+   - name: Input name (default: 'search')
+   - placeholder: Placeholder text (default: 'Search...')
+   - value: Current search value (optional)
+   - button_text: Search button text (default: 'Search')
+#}
+
+{% with
+   search_name=name|default:"search"
+   search_placeholder=placeholder|default:"Search..."
+   search_value=value|default:""
+   search_button_text=button_text|default:"Search"
+%}
+
+<div class="flex gap-2">
+   <div class="flex-1">
+      {% include 'components/atoms/input.html' with name=search_name type="text" placeholder=search_placeholder value=search_value %}
+   </div>
+   <div>
+      {% include 'components/atoms/button.html' with text=search_button_text type="primary" %}
+   </div>
+</div>
+
+{% endwith %}

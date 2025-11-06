@@ -19,34 +19,15 @@
 <body class="bg-gray-100 min-h-screen">
 
     {% if user.is_authenticated %}
-    <!-- Navigation -->
-    <nav class="bg-blue-600 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <h1 class="text-2xl font-bold">Richwell School Portal</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm">
-                        Welcome, <strong>{{ user.get_full_name|default:user.username }}</strong>
-                        <span class="ml-2 px-2 py-1 bg-blue-700 rounded text-xs uppercase">{{ user.role }}</span>
-                    </span>
-                    <a href="{% url 'logout' %}" class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded transition">
-                        Logout
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <!-- Navigation - Using Organism Component -->
+    {% include 'components/organisms/navbar.html' with user=user %}
     {% endif %}
 
-    <!-- Messages -->
+    <!-- Messages - Using Molecule Component -->
     {% if messages %}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
         {% for message in messages %}
-        <div class="{% if message.tags == 'error' %}bg-red-100 border-red-400 text-red-700{% elif message.tags == 'success' %}bg-green-100 border-green-400 text-green-700{% elif message.tags == 'warning' %}bg-yellow-100 border-yellow-400 text-yellow-700{% else %}bg-blue-100 border-blue-400 text-blue-700{% endif %} border px-4 py-3 rounded mb-4" role="alert">
-            <span class="block sm:inline">{{ message }}</span>
-        </div>
+        {% include 'components/molecules/alert.html' with message=message type=message.tags dismissible=True %}
         {% endfor %}
     </div>
     {% endif %}
@@ -56,12 +37,8 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white mt-12 py-6 border-t">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-600">
-            <p>&copy; 2025 Richwell School Portal. All rights reserved.</p>
-        </div>
-    </footer>
+    <!-- Footer - Using Organism Component -->
+    {% include 'components/organisms/footer.html' %}
 
     {% block extra_scripts %}{% endblock %}
 </body>

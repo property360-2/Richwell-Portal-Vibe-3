@@ -1,0 +1,35 @@
+{# Atom: Textarea Component
+   Usage: {% include 'components/atoms/textarea.html' with name='description' placeholder='Enter description' %}
+   Props:
+   - name: Textarea name attribute (required)
+   - placeholder: Placeholder text (optional)
+   - value: Textarea value (optional)
+   - rows: Number of rows (default: 4)
+   - required: boolean (optional)
+   - disabled: boolean (optional)
+   - id: Textarea ID (optional, defaults to name)
+   - classes: Additional CSS classes (optional)
+#}
+
+{% with
+   textarea_name=name
+   textarea_placeholder=placeholder|default:""
+   textarea_value=value|default:""
+   textarea_rows=rows|default:"4"
+   textarea_id=id|default:name
+   textarea_required=required|default:False
+   textarea_disabled=disabled|default:False
+   textarea_classes=classes|default:""
+%}
+
+<textarea
+   id="{{ textarea_id }}"
+   name="{{ textarea_name }}"
+   rows="{{ textarea_rows }}"
+   {% if textarea_placeholder %}placeholder="{{ textarea_placeholder }}"{% endif %}
+   {% if textarea_required %}required{% endif %}
+   {% if textarea_disabled %}disabled{% endif %}
+   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition {{ textarea_classes }} {% if textarea_disabled %}bg-gray-100 cursor-not-allowed{% endif %}"
+>{% if textarea_value %}{{ textarea_value }}{% endif %}</textarea>
+
+{% endwith %}

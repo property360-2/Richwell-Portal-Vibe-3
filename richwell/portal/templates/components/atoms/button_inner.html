@@ -1,0 +1,15 @@
+{# Button Inner Template - Do not use directly #}
+{% with
+   size_classes=btn_size|default:"md"
+   full_classes=base_classes|add:" rounded transition duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
+%}
+
+{% if size_classes == 'sm' %}
+   {% with size_class="px-3 py-1.5 text-sm" %}{% include 'components/atoms/button_render.html' %}{% endwith %}
+{% elif size_classes == 'lg' %}
+   {% with size_class="px-6 py-3 text-lg" %}{% include 'components/atoms/button_render.html' %}{% endwith %}
+{% else %}
+   {% with size_class="px-4 py-2 text-base" %}{% include 'components/atoms/button_render.html' %}{% endwith %}
+{% endif %}
+
+{% endwith %}

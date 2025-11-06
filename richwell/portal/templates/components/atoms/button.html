@@ -1,0 +1,37 @@
+{# Atom: Button Component
+   Usage: {% include 'components/atoms/button.html' with text='Click Me' type='primary' %}
+   Props:
+   - text: Button text (required)
+   - type: primary|secondary|danger|success|warning (default: primary)
+   - size: sm|md|lg (default: md)
+   - href: URL for link buttons (optional)
+   - onclick: JavaScript onclick handler (optional)
+   - icon: Icon HTML (optional)
+   - disabled: boolean (optional)
+#}
+
+{% with
+   btn_type=type|default:"primary"
+   btn_size=size|default:"md"
+   btn_text=text
+   btn_href=href|default:""
+   btn_onclick=onclick|default:""
+   btn_icon=icon|default:""
+   btn_disabled=disabled|default:False
+%}
+
+{% if btn_type == 'primary' %}
+   {% with base_classes="bg-blue-600 hover:bg-blue-700 text-white" %}{% include 'components/atoms/button_inner.html' %}{% endwith %}
+{% elif btn_type == 'secondary' %}
+   {% with base_classes="bg-gray-600 hover:bg-gray-700 text-white" %}{% include 'components/atoms/button_inner.html' %}{% endwith %}
+{% elif btn_type == 'danger' %}
+   {% with base_classes="bg-red-600 hover:bg-red-700 text-white" %}{% include 'components/atoms/button_inner.html' %}{% endwith %}
+{% elif btn_type == 'success' %}
+   {% with base_classes="bg-green-600 hover:bg-green-700 text-white" %}{% include 'components/atoms/button_inner.html' %}{% endwith %}
+{% elif btn_type == 'warning' %}
+   {% with base_classes="bg-yellow-500 hover:bg-yellow-600 text-white" %}{% include 'components/atoms/button_inner.html' %}{% endwith %}
+{% elif btn_type == 'outline' %}
+   {% with base_classes="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white bg-transparent" %}{% include 'components/atoms/button_inner.html' %}{% endwith %}
+{% endif %}
+
+{% endwith %}
