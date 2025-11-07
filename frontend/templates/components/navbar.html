@@ -1,0 +1,86 @@
+<nav class="bg-blue-600 shadow-lg" x-data="{ mobileMenuOpen: false }">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+            <!-- Logo and Brand -->
+            <div class="flex items-center space-x-4">
+                <a href="/" class="text-white text-2xl font-bold">
+                    🎓 Richwell Portal
+                </a>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-6">
+                {% if user.is_authenticated %}
+                    <!-- Role-based navigation -->
+                    <a href="/" class="text-white hover:text-blue-200 transition">Dashboard</a>
+
+                    {% if user.role == 'student' %}
+                        <a href="#" class="text-white hover:text-blue-200 transition">My Enrollment</a>
+                        <a href="#" class="text-white hover:text-blue-200 transition">My Grades</a>
+                    {% elif user.role == 'professor' %}
+                        <a href="#" class="text-white hover:text-blue-200 transition">My Classes</a>
+                        <a href="#" class="text-white hover:text-blue-200 transition">Grade Submission</a>
+                    {% elif user.role == 'registrar' or user.role == 'dean' or user.role == 'admin' %}
+                        <a href="#" class="text-white hover:text-blue-200 transition">Students</a>
+                        <a href="#" class="text-white hover:text-blue-200 transition">Enrollment</a>
+                        <a href="#" class="text-white hover:text-blue-200 transition">Reports</a>
+                    {% elif user.role == 'admission' %}
+                        <a href="#" class="text-white hover:text-blue-200 transition">Applications</a>
+                    {% endif %}
+
+                    <!-- User Menu -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="flex items-center space-x-2 text-white hover:text-blue-200 transition">
+                            <span>{{ user.username }}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="open"
+                             @click.away="open = false"
+                             x-transition
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Profile</a>
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Settings</a>
+                            <hr class="my-2">
+                            <a href="#" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="#" class="text-white hover:text-blue-200 transition">Login</a>
+                    <a href="#" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition">Apply Now</a>
+                {% endif %}
+            </div>
+
+            <!-- Mobile menu button -->
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div x-show="mobileMenuOpen"
+             x-transition
+             class="md:hidden pb-4">
+            {% if user.is_authenticated %}
+                <a href="/" class="block py-2 text-white hover:text-blue-200">Dashboard</a>
+                {% if user.role == 'student' %}
+                    <a href="#" class="block py-2 text-white hover:text-blue-200">My Enrollment</a>
+                    <a href="#" class="block py-2 text-white hover:text-blue-200">My Grades</a>
+                {% elif user.role == 'professor' %}
+                    <a href="#" class="block py-2 text-white hover:text-blue-200">My Classes</a>
+                    <a href="#" class="block py-2 text-white hover:text-blue-200">Grade Submission</a>
+                {% endif %}
+                <hr class="my-2 border-blue-500">
+                <a href="#" class="block py-2 text-white hover:text-blue-200">Profile</a>
+                <a href="#" class="block py-2 text-white hover:text-blue-200">Settings</a>
+                <a href="#" class="block py-2 text-red-300 hover:text-red-100">Logout</a>
+            {% else %}
+                <a href="#" class="block py-2 text-white hover:text-blue-200">Login</a>
+                <a href="#" class="block py-2 text-white hover:text-blue-200">Apply Now</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

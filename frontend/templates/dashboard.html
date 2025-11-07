@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Richwell School Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Welcome Section -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            Welcome{% if user.is_authenticated %}, {{ user.get_full_name|default:user.username }}{% endif %}!
+        </h1>
+        <p class="text-gray-600">
+            {% if user.is_authenticated %}
+                Role: <span class="font-semibold text-blue-600">{{ user.get_role_display }}</span>
+            {% else %}
+                Welcome to Richwell School Portal
+            {% endif %}
+        </p>
+    </div>
+
+    {% if user.is_authenticated %}
+        <!-- Role-based Dashboard Content -->
+
+        {% if user.role == 'student' %}
+            <!-- Student Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Enrollment Status Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Enrollment</h2>
+                        <span class="text-3xl">📚</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Current enrollment status and subject registration</p>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
+                        View Enrollment
+                    </button>
+                </div>
+
+                <!-- Grades Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">My Grades</h2>
+                        <span class="text-3xl">📊</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">View your academic performance and grades</p>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
+                        View Grades
+                    </button>
+                </div>
+
+                <!-- Profile Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Profile</h2>
+                        <span class="text-3xl">👤</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Update your personal information</p>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
+                        Edit Profile
+                    </button>
+                </div>
+            </div>
+
+        {% elif user.role == 'professor' %}
+            <!-- Professor Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- My Classes Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">My Classes</h2>
+                        <span class="text-3xl">🏫</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">View your assigned sections and students</p>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
+                        View Classes
+                    </button>
+                </div>
+
+                <!-- Grade Submission Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Submit Grades</h2>
+                        <span class="text-3xl">✍️</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Enter and submit student grades</p>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
+                        Grade Students
+                    </button>
+                </div>
+
+                <!-- Schedule Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Schedule</h2>
+                        <span class="text-3xl">📅</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">View your teaching schedule</p>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
+                        View Schedule
+                    </button>
+                </div>
+            </div>
+
+        {% elif user.role == 'registrar' or user.role == 'dean' or user.role == 'admin' %}
+            <!-- Registrar/Dean/Admin Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Students Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Students</h2>
+                        <span class="text-3xl">👨‍🎓</span>
+                    </div>
+                    <p class="text-3xl font-bold text-blue-600 mb-2">0</p>
+                    <p class="text-gray-600">Total Students</p>
+                </div>
+
+                <!-- Enrollment Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Enrollment</h2>
+                        <span class="text-3xl">📝</span>
+                    </div>
+                    <p class="text-3xl font-bold text-green-600 mb-2">0</p>
+                    <p class="text-gray-600">Active Enrollments</p>
+                </div>
+
+                <!-- Sections Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Sections</h2>
+                        <span class="text-3xl">🏛️</span>
+                    </div>
+                    <p class="text-3xl font-bold text-purple-600 mb-2">0</p>
+                    <p class="text-gray-600">Total Sections</p>
+                </div>
+
+                <!-- Reports Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Reports</h2>
+                        <span class="text-3xl">📊</span>
+                    </div>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
+                        + Add Student
+                    </button>
+                    <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                        Manage Enrollment
+                    </button>
+                    <button class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition">
+                        Settings
+                    </button>
+                </div>
+            </div>
+
+        {% elif user.role == 'admission' %}
+            <!-- Admission Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Applications Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Applications</h2>
+                        <span class="text-3xl">📋</span>
+                    </div>
+                    <p class="text-3xl font-bold text-blue-600 mb-2">0</p>
+                    <p class="text-gray-600">Pending Applications</p>
+                </div>
+
+                <!-- Approved Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Approved</h2>
+                        <span class="text-3xl">✅</span>
+                    </div>
+                    <p class="text-3xl font-bold text-green-600 mb-2">0</p>
+                    <p class="text-gray-600">Approved Today</p>
+                </div>
+
+                <!-- Settings Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Settings</h2>
+                        <span class="text-3xl">⚙️</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Manage admission settings</p>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
+                        Configure
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Recent Activity Section -->
+        <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Recent Activity</h2>
+            <div class="text-gray-500 text-center py-8">
+                <p>No recent activity to display</p>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Public/Guest Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Login Card -->
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Student & Staff Login</h2>
+                <p class="text-gray-600 mb-6">Access your account to view grades, enroll in courses, and more.</p>
+                <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition w-full">
+                    Login
+                </button>
+            </div>
+
+            <!-- Apply Card -->
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Apply for Admission</h2>
+                <p class="text-gray-600 mb-6">Start your journey with us. Apply online for freshman or transferee admission.</p>
+                <button class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition w-full">
+                    Apply Now
+                </button>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
