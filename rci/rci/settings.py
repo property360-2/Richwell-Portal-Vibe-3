@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     "audit",
     "settingsapp",
     "admission",
+    "reports",
+    "staff",
 ]
 
 MIDDLEWARE = [

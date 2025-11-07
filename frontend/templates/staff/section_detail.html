@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Section Details - {{ section.section_code }}{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <a href="{% url 'staff:sections_list' %}" class="text-blue-600 hover:text-blue-800 font-semibold mb-4 inline-block">← Back to Sections</a>
+
+    <h1 class="text-3xl font-bold mb-6">Section Details</h1>
+
+    <!-- Section Information -->
+    <div class="grid grid-cols-3 gap-6 mb-6">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">Section Information</h2>
+            <div class="space-y-3">
+                <div>
+                    <p class="text-sm text-gray-600">Section Code</p>
+                    <p class="font-bold text-2xl">{{ section.section_code }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Subject</p>
+                    <p class="font-semibold">{{ section.subject.code }}</p>
+                    <p class="text-sm">{{ section.subject.title }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Term</p>
+                    <p class="font-semibold">{{ section.term.name }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">Professor</h2>
+            <div class="space-y-3">
+                <div>
+                    <p class="text-sm text-gray-600">Name</p>
+                    <p class="font-bold">{{ section.professor.get_full_name }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Email</p>
+                    <p class="font-semibold">{{ section.professor.email }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">Capacity</h2>
+            <div class="space-y-3">
+                <div>
+                    <p class="text-sm text-gray-600">Enrolled</p>
+                    <p class="font-bold text-blue-600 text-3xl">{{ enrolled_count }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Capacity</p>
+                    <p class="font-bold text-purple-600 text-3xl">{{ section.capacity }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Available Slots</p>
+                    <p class="font-bold text-green-600 text-3xl">{{ available_slots }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrolled Students -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Enrolled Students</h2>
+        <table class="w-full">
+            <thead>
+                <tr class="bg-gray-50">
+                    <th class="text-left py-3 px-4">Student ID</th>
+                    <th class="text-left py-3 px-4">Name</th>
+                    <th class="text-left py-3 px-4">Program</th>
+                    <th class="text-center py-3 px-4">Year Level</th>
+                    <th class="text-center py-3 px-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for enrollment in enrollments %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4 font-mono">{{ enrollment.student.student_id }}</td>
+                    <td class="py-3 px-4 font-semibold">{{ enrollment.student.user.get_full_name }}</td>
+                    <td class="py-3 px-4 text-sm">{{ enrollment.student.program.name }}</td>
+                    <td class="py-3 px-4 text-center">{{ enrollment.student.year_level }}</td>
+                    <td class="py-3 px-4 text-center">
+                        <a href="{% url 'staff:student_detail' enrollment.student.id %}" class="text-blue-600 hover:text-blue-800">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="py-12 text-center text-gray-500">No students enrolled</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Term Details - {{ term.name }}{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <a href="{% url 'staff:terms_list' %}" class="text-blue-600 hover:text-blue-800 font-semibold mb-4 inline-block">← Back to Terms</a>
+
+    <h1 class="text-3xl font-bold mb-6">Term Details: {{ term.name }}</h1>
+
+    <!-- Term Information -->
+    <div class="grid grid-cols-4 gap-6 mb-6">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="text-sm text-gray-600 mb-2">Start Date</p>
+            <p class="font-bold text-lg">{{ term.start_date|date:"M d, Y" }}</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="text-sm text-gray-600 mb-2">End Date</p>
+            <p class="font-bold text-lg">{{ term.end_date|date:"M d, Y" }}</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="text-sm text-gray-600 mb-2">Sections</p>
+            <p class="font-bold text-3xl text-blue-600">{{ total_sections }}</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <p class="text-sm text-gray-600 mb-2">Total Enrollments</p>
+            <p class="font-bold text-3xl text-green-600">{{ total_enrollments }}</p>
+        </div>
+    </div>
+
+    <!-- Additional Stats -->
+    <div class="grid grid-cols-3 gap-6 mb-6">
+        <div class="bg-purple-50 p-6 rounded-xl">
+            <p class="text-sm text-gray-600 mb-2">Unique Students</p>
+            <p class="font-bold text-3xl text-purple-600">{{ unique_students }}</p>
+        </div>
+        <div class="bg-indigo-50 p-6 rounded-xl">
+            <p class="text-sm text-gray-600 mb-2">Status</p>
+            <p class="font-bold text-xl {% if term.is_active %}text-green-600{% else %}text-gray-600{% endif %}">
+                {% if term.is_active %}Active{% else %}Inactive{% endif %}
+            </p>
+        </div>
+        <div class="bg-blue-50 p-6 rounded-xl">
+            <p class="text-sm text-gray-600 mb-2">Grade Deadline</p>
+            <p class="font-bold text-lg">{{ term.grade_deadline|date:"M d, Y" }}</p>
+        </div>
+    </div>
+
+    <!-- Sections in Term -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">Sections</h2>
+        <table class="w-full">
+            <thead>
+                <tr class="bg-gray-50">
+                    <th class="text-left py-3 px-4">Section Code</th>
+                    <th class="text-left py-3 px-4">Subject</th>
+                    <th class="text-left py-3 px-4">Professor</th>
+                    <th class="text-center py-3 px-4">Enrolled/Capacity</th>
+                    <th class="text-center py-3 px-4">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for section in sections %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4 font-bold">{{ section.section_code }}</td>
+                    <td class="py-3 px-4">{{ section.subject.code }} - {{ section.subject.title }}</td>
+                    <td class="py-3 px-4">{{ section.professor.get_full_name }}</td>
+                    <td class="py-3 px-4 text-center font-semibold">{{ section.enrolled_count }}/{{ section.capacity }}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-sm {% if section.status == 'open' %}bg-green-100 text-green-800{% elif section.status == 'full' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ section.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="py-12 text-center text-gray-500">No sections in this term</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

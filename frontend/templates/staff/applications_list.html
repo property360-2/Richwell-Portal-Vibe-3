@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Admission Applications{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Admission Applications</h1>
+
+    <!-- Filters and Search -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <form method="get" class="grid grid-cols-4 gap-4">
+            <input type="text" name="search" placeholder="Search by name or email..." value="{{ search }}" class="px-3 py-2 border rounded-lg">
+            <select name="status" class="px-3 py-2 border rounded-lg">
+                <option value="">All Statuses</option>
+                <option value="submitted" {% if selected_status == "submitted" %}selected{% endif %}>Submitted</option>
+                <option value="approved" {% if selected_status == "approved" %}selected{% endif %}>Approved</option>
+                <option value="rejected" {% if selected_status == "rejected" %}selected{% endif %}>Rejected</option>
+            </select>
+            <select name="type" class="px-3 py-2 border rounded-lg">
+                <option value="">All Types</option>
+                <option value="freshman" {% if selected_type == "freshman" %}selected{% endif %}>Freshman</option>
+                <option value="transferee" {% if selected_type == "transferee" %}selected{% endif %}>Transferee</option>
+            </select>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Filter</button>
+        </form>
+    </div>
+
+    <!-- Applications Count -->
+    <div class="bg-blue-50 p-4 rounded-lg mb-6">
+        <p class="text-lg"><span class="font-bold text-blue-600">{{ applications.count }}</span> applications found</p>
+    </div>
+
+    <!-- Applications Table -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <table class="w-full">
+            <thead>
+                <tr class="bg-gray-50">
+                    <th class="text-left py-3 px-4">Name</th>
+                    <th class="text-left py-3 px-4">Email</th>
+                    <th class="text-left py-3 px-4">Program</th>
+                    <th class="text-center py-3 px-4">Type</th>
+                    <th class="text-center py-3 px-4">Status</th>
+                    <th class="text-center py-3 px-4">Submitted</th>
+                    <th class="text-center py-3 px-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for application in applications %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4 font-semibold">{{ application.first_name }} {{ application.last_name }}</td>
+                    <td class="py-3 px-4 text-sm">{{ application.email }}</td>
+                    <td class="py-3 px-4">{{ application.program.name }}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-sm {% if application.student_type == 'freshman' %}bg-blue-100 text-blue-800{% else %}bg-purple-100 text-purple-800{% endif %}">
+                            {{ application.get_student_type_display }}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-sm {% if application.status == 'approved' %}bg-green-100 text-green-800{% elif application.status == 'rejected' %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                            {{ application.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-center text-sm">{{ application.submitted_at|date:"M d, Y" }}</td>
+                    <td class="py-3 px-4 text-center">
+                        <a href="{% url 'staff:application_detail' application.id %}" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="py-12 text-center text-gray-500">No applications found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
