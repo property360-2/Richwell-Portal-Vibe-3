@@ -1,4 +1,4 @@
-# backend/core/settings.py
+# rci/rci/settings.py
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -37,7 +37,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "core.urls"
+ROOT_URLCONF = "rci.urls"
 
 TEMPLATES = [
     {
@@ -55,7 +55,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "core.wsgi.application"
+WSGI_APPLICATION = "rci.wsgi.application"
 
 DATABASES = {
     "default": {
