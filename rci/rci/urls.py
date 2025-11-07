@@ -13,4 +13,5 @@ urlpatterns = [
     path("profile/", user_views.profile_view, name="profile"),
     path("users/", include("users.urls")),
     path("admission/", include("admission.urls")),
+    path("enrollment/", include("enrollment.urls")),
 ]

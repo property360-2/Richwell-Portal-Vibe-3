@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}No Active Term - Richwell School Portal{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-16">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-12 text-center">
+        <div class="inline-block bg-gray-100 rounded-full p-6 mb-6">
+            <svg class="w-16 h-16 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">No Active Enrollment Term</h1>
+        <p class="text-gray-600 mb-6 text-lg">
+            There is currently no active enrollment term. The registrar will open enrollment when the next term begins.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-8 text-left">
+            <p class="text-sm text-blue-900 font-semibold mb-2">Questions?</p>
+            <p class="text-sm text-gray-700">
+                For information about upcoming enrollment periods, please contact the registrar's office at <strong>registrar@richwell.edu</strong>.
+            </p>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+            Return to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
