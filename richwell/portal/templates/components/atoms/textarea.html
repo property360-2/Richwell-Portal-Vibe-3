@@ -1,9 +1,0 @@
-<textarea
-   id="{{ id|default:name }}"
-   name="{{ name }}"
-   rows="{{ rows|default:'4' }}"
-   {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
-   {% if required %}required{% endif %}
-   {% if disabled %}disabled{% endif %}
-   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition {{ classes|default:'' }} {% if disabled %}bg-gray-100 cursor-not-allowed{% endif %}"
->{% if value %}{{ value }}{% endif %}</textarea>
