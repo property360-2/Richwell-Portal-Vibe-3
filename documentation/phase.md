@@ -7,6 +7,7 @@
 ### 🎯 Goal
 
 Establish project structure, environment, and repository standards.
+always refer to the plan, this should be precise
 
 ### ✅ Tasks
 
@@ -33,10 +34,7 @@ Implement all schema tables, constraints, and Django ORM mappings.
 ### ✅ Tasks
 
 * Define all models from database schema:
-
-  * `Users`, `Programs`, `Curricula`, `Subjects`, `Prereqs`
-  * `CurriculumSubjects`, `Students`, `Terms`, `Sections`
-  * `StudentSubjects`, `Grades`, `AuditTrail`, `Archive`, `Settings`
+ inside the Documentation\schema.md
 * Apply all foreign keys, enums (as choices), and default fields.
 * Run migrations and confirm integrity.
 * Register all models in Django Admin for data inspection.
