@@ -27,7 +27,7 @@ def admission_form_view(request):
         if form.is_valid():
             application = form.save()
             messages.success(request, 'Your application has been submitted successfully!')
-            return redirect('admission_confirmation', pk=application.pk)
+            return redirect('admission:confirmation', pk=application.pk)
     else:
         form = AdmissionApplicationForm()
 
