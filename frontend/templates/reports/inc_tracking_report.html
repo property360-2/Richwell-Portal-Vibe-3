@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}INC Tracking Report{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <a href="{% url 'reports:dashboard' %}" class="text-blue-600 hover:text-blue-800 font-semibold mb-4 inline-block">← Back</a>
+    <h1 class="text-3xl font-bold mb-6">INC Tracking & Repeat Rates</h1>
+    
+    <div class="grid grid-cols-3 gap-6 mb-6">
+        <div class="bg-yellow-50 p-6 rounded-xl"><p class="text-sm text-gray-600">Total INCs</p><p class="text-4xl font-bold text-yellow-600">{{ total_incs }}</p></div>
+        <div class="bg-green-50 p-6 rounded-xl"><p class="text-sm text-gray-600">Active INCs</p><p class="text-4xl font-bold text-green-600">{{ total_active }}</p></div>
+        <div class="bg-red-50 p-6 rounded-xl"><p class="text-sm text-gray-600">Expired INCs</p><p class="text-4xl font-bold text-red-600">{{ total_expired }}</p></div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">Active INC Grades</h2>
+        <table class="w-full">
+            <thead><tr class="bg-gray-50"><th class="text-left py-2 px-4">Student</th><th class="text-left py-2 px-4">Subject</th><th class="text-left py-2 px-4">Term</th><th class="text-left py-2 px-4">Posted Date</th><th class="text-left py-2 px-4">Expiration</th></tr></thead>
+            <tbody>
+                {% for grade in active_incs %}
+                <tr class="border-b"><td class="py-2 px-4">{{ grade.student_subject.student.user.get_full_name }}</td><td class="py-2 px-4 font-semibold">{{ grade.subject.code }}</td><td class="py-2 px-4 text-sm">{{ grade.student_subject.term.name }}</td><td class="py-2 px-4 text-sm">{{ grade.inc_posted_date|date:"M d, Y" }}</td><td class="py-2 px-4 text-sm">{{ grade.inc_expiration_date|date:"M d, Y" }}</td></tr>
+                {% empty %}
+                <tr><td colspan="5" class="py-8 text-center text-gray-500">No active INC grades</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-xl font-bold mb-4 text-red-600">Expired INC Grades</h2>
+        <table class="w-full">
+            <thead><tr class="bg-red-50"><th class="text-left py-2 px-4">Student</th><th class="text-left py-2 px-4">Subject</th><th class="text-left py-2 px-4">Expired Date</th></tr></thead>
+            <tbody>
+                {% for grade in expired_incs %}
+                <tr class="border-b"><td class="py-2 px-4">{{ grade.student_subject.student.user.get_full_name }}</td><td class="py-2 px-4 font-semibold">{{ grade.subject.code }}</td><td class="py-2 px-4 text-red-600 font-semibold">{{ grade.inc_expiration_date|date:"M d, Y" }}</td></tr>
+                {% empty %}
+                <tr><td colspan="3" class="py-8 text-center text-gray-500">No expired INC grades</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
