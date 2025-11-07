@@ -423,8 +423,6 @@ class Command(BaseCommand):
                 'program': bscs,
                 'curriculum': bscs_curr,
                 'status': 'active',
-                'year_level': 1,
-                'student_id': 'BSCS-2025-001',
                 'documents_json': {}
             }
         )
@@ -436,8 +434,6 @@ class Command(BaseCommand):
                 'program': bscs,
                 'curriculum': bscs_curr,
                 'status': 'active',
-                'year_level': 2,
-                'student_id': 'BSCS-2024-002',
                 'documents_json': {}
             }
         )
@@ -449,8 +445,6 @@ class Command(BaseCommand):
                 'program': bscs,
                 'curriculum': bscs_curr,
                 'status': 'active',
-                'year_level': 2,
-                'student_id': 'BSCS-2024-003',
                 'documents_json': {}
             }
         )
@@ -462,8 +456,6 @@ class Command(BaseCommand):
                 'program': bscs,
                 'curriculum': bscs_curr,
                 'status': 'active',
-                'year_level': 2,
-                'student_id': 'BSCS-2024-004',
                 'documents_json': {}
             }
         )
@@ -779,27 +771,30 @@ class Command(BaseCommand):
         self.stdout.write('  │ Student     │ student_dela_cruz    │ student123     │')
         self.stdout.write('  └─────────────┴──────────────────────┴────────────────┘')
 
-        self.stdout.write('\n📚 Test Scenarios:')
-        self.stdout.write('  1. FRESHMAN (username: freshman)')
+        self.stdout.write('\n📚 Test Scenarios (All passwords: student123):')
+        self.stdout.write('')
+        self.stdout.write('  1. FRESHMAN → username: freshman')
         self.stdout.write('     • No prior subjects')
         self.stdout.write('     • Can enroll up to 30 units (freshman cap)')
-        self.stdout.write('     • Tests: Unit cap enforcement')
+        self.stdout.write('     • Available subjects: CS101, CS102, MATH101, ENG101')
+        self.stdout.write('     • Tests: Freshman unit cap enforcement')
         self.stdout.write('')
-        self.stdout.write('  2. STUDENT WITH INC (username: student_with_inc)')
-        self.stdout.write('     • Has EXPIRED INC in CS102 (major, 8 months old)')
-        self.stdout.write('     • Has ACTIVE INC in MATH102 (minor, 8 months old)')
-        self.stdout.write('     • Completed: CS101, MATH101, ENG101, CS103')
-        self.stdout.write('     • Tests: INC expiration, prerequisite blocking')
+        self.stdout.write('  2. STUDENT WITH INC → username: student_with_inc')
+        self.stdout.write('     • Has EXPIRED INC in CS102 (major, 8 months old > 6 months)')
+        self.stdout.write('     • Has ACTIVE INC in MATH102 (minor, 8 months old < 1 year)')
+        self.stdout.write('     • Completed: CS101 (1.75), MATH101 (2.00), ENG101 (2.50), CS103 (2.25)')
+        self.stdout.write('     • Cannot enroll in CS201 (blocked by CS102 INC prerequisite)')
+        self.stdout.write('     • Tests: INC expiration rules, prerequisite blocking')
         self.stdout.write('')
-        self.stdout.write('  3. STUDENT CLEAN (username: student_clean)')
-        self.stdout.write('     • All Year 1 subjects completed')
+        self.stdout.write('  3. STUDENT CLEAN → username: student_clean')
+        self.stdout.write('     • All Year 1 subjects completed with passing grades')
         self.stdout.write('     • No INC grades')
-        self.stdout.write('     • Ready to enroll in Year 2 (CS201, CS202)')
-        self.stdout.write('     • Tests: Prerequisites met, normal enrollment')
+        self.stdout.write('     • Ready to enroll in Year 2 subjects: CS201, CS202')
+        self.stdout.write('     • Tests: Normal enrollment, all prerequisites met')
         self.stdout.write('')
-        self.stdout.write('  4. REGULAR STUDENT (username: student_dela_cruz)')
-        self.stdout.write('     • Most Year 1 subjects completed')
-        self.stdout.write('     • Failed CS103 (needs to repeat)')
+        self.stdout.write('  4. REGULAR STUDENT → username: student_dela_cruz')
+        self.stdout.write('     • Completed most Year 1 subjects')
+        self.stdout.write('     • Failed CS103 (grade: 5.00) - needs to repeat')
         self.stdout.write('     • Tests: Failed subject re-enrollment')
 
         self.stdout.write('\n✅ Ready to test all plan.md scenarios!')
