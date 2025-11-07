@@ -284,7 +284,7 @@ def enrollment_view(request):
         messages.error(request, 'Access denied: Students only')
         return redirect('dashboard')
 
-    from .models import Student, Term, Section
+    from .models import Student, Term, Section, StudentSubject
     from .forms import EnrollmentForm
 
     try:
