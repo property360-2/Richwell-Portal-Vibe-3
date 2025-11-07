@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Submitted - Richwell School Portal</title>
+    <title>Account Created - Richwell School Portal</title>
 
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center">
-    <div class="container mx-auto px-4 py-8">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center py-8">
+    <div class="container mx-auto px-4">
         <div class="max-w-3xl mx-auto">
             <!-- Success Icon -->
             <div class="text-center mb-8">
@@ -18,21 +18,56 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
-                <h1 class="text-4xl font-bold text-gray-800 mb-2">Application Submitted!</h1>
-                <p class="text-gray-600 text-lg">Thank you for applying to Richwell School Portal</p>
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">Welcome to Richwell School Portal!</h1>
+                <p class="text-gray-600 text-lg">Your account has been created automatically</p>
             </div>
 
+            {% if username and password %}
+            <!-- Login Credentials (Most Important!) -->
+            <div class="bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl shadow-2xl overflow-hidden mb-6 p-8 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold">Your Login Credentials</h2>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                    </svg>
+                </div>
+
+                <div class="bg-white/20 backdrop-blur rounded-xl p-6 mb-4">
+                    <div class="mb-4">
+                        <p class="text-green-100 text-sm mb-1">Username</p>
+                        <p class="text-2xl font-mono font-bold">{{ username }}</p>
+                    </div>
+                    <div>
+                        <p class="text-green-100 text-sm mb-1">Temporary Password</p>
+                        <p class="text-2xl font-mono font-bold">{{ password }}</p>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-500/30 border-2 border-yellow-300 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            <p class="font-bold mb-1">IMPORTANT: Save these credentials now!</p>
+                            <p class="text-sm text-yellow-50">Write down or screenshot your username and password. You'll need them to log in to the portal.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Application Details -->
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden mb-6">
-                <div class="bg-gradient-to-r from-green-600 to-teal-600 p-6 text-white">
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
                     <h2 class="text-2xl font-bold">Application Summary</h2>
-                    <p class="text-green-100 mt-1">Application Reference # {{ application.id }}</p>
+                    <p class="text-blue-100 mt-1">Reference # {{ application.id }}</p>
                 </div>
 
                 <div class="p-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <h3 class="text-sm font-semibold text-gray-600 mb-1">Applicant Name</h3>
+                            <h3 class="text-sm font-semibold text-gray-600 mb-1">Student Name</h3>
                             <p class="text-lg text-gray-800">{{ application.full_name }}</p>
                         </div>
                         <div>
@@ -40,7 +75,7 @@
                             <p class="text-lg text-gray-800">{{ application.email }}</p>
                         </div>
                         <div>
-                            <h3 class="text-sm font-semibold text-gray-600 mb-1">Applicant Type</h3>
+                            <h3 class="text-sm font-semibold text-gray-600 mb-1">Student Type</h3>
                             <p class="text-lg text-gray-800">{{ application.get_applicant_type_display }}</p>
                         </div>
                         <div>
@@ -52,10 +87,10 @@
                             <p class="text-lg text-gray-800">{{ application.application_date|date:"F d, Y h:i A" }}</p>
                         </div>
                         <div>
-                            <h3 class="text-sm font-semibold text-gray-600 mb-1">Status</h3>
+                            <h3 class="text-sm font-semibold text-gray-600 mb-1">Account Status</h3>
                             <p class="text-lg">
-                                <span class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full font-semibold">
-                                    {{ application.get_status_display }}
+                                <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full font-semibold">
+                                    Active
                                 </span>
                             </p>
                         </div>
@@ -81,15 +116,36 @@
 
             <!-- Next Steps -->
             <div class="bg-white rounded-2xl shadow-lg p-8 mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">What Happens Next?</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">What Happens Next?</h2>
+
+                {% if application.applicant_type == 'freshman' %}
+                <!-- Freshman Steps -->
                 <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                            ✓
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Account Created</h3>
+                            <p class="text-gray-600">Your student account has been created and is ready to use.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                            ✓
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Auto-Enrollment Complete</h3>
+                            <p class="text-gray-600">You've been automatically enrolled in recommended first-year subjects (up to 30 units).</p>
+                        </div>
+                    </div>
                     <div class="flex items-start">
                         <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
                             1
                         </div>
                         <div>
-                            <h3 class="font-semibold text-gray-800">Application Review</h3>
-                            <p class="text-gray-600">Our admission team will review your application within 3-5 business days.</p>
+                            <h3 class="font-semibold text-gray-800">Login to Your Account</h3>
+                            <p class="text-gray-600">Use the credentials above to log in and view your enrolled subjects.</p>
                         </div>
                     </div>
                     <div class="flex items-start">
@@ -97,8 +153,8 @@
                             2
                         </div>
                         <div>
-                            <h3 class="font-semibold text-gray-800">Email Notification</h3>
-                            <p class="text-gray-600">You'll receive an email at <strong>{{ application.email }}</strong> with your application status.</p>
+                            <h3 class="font-semibold text-gray-800">Review Your Schedule</h3>
+                            <p class="text-gray-600">Check your dashboard to see your subjects, sections, and professors.</p>
                         </div>
                     </div>
                     <div class="flex items-start">
@@ -106,31 +162,79 @@
                             3
                         </div>
                         <div>
-                            <h3 class="font-semibold text-gray-800">Account Creation</h3>
-                            <p class="text-gray-600">If approved, we'll create your student account and send you login credentials.</p>
+                            <h3 class="font-semibold text-gray-800">Add/Drop Subjects (Optional)</h3>
+                            <p class="text-gray-600">You can add or drop subjects within the unit cap limit (30 units).</p>
                         </div>
                     </div>
-                    {% if application.applicant_type == 'freshman' %}
+                </div>
+                {% else %}
+                <!-- Transferee Steps -->
+                <div class="space-y-4">
                     <div class="flex items-start">
-                        <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
-                            4
+                        <div class="flex-shrink-0 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                            ✓
                         </div>
                         <div>
-                            <h3 class="font-semibold text-gray-800">Auto-Enrollment</h3>
-                            <p class="text-gray-600">As a freshman, you'll be automatically enrolled in recommended first-year subjects (up to 30 units).</p>
+                            <h3 class="font-semibold text-gray-800">Account Created</h3>
+                            <p class="text-gray-600">Your student account has been created and is ready to use.</p>
                         </div>
                     </div>
-                    {% endif %}
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-yellow-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                            !
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">TOR Validation Pending</h3>
+                            <p class="text-gray-600">Our registrar will review your Transcript of Records (TOR) to validate your credits.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                            1
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Submit Required Documents</h3>
+                            <p class="text-gray-600">Please submit your TOR and other transfer documents to the registrar's office.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                            2
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Credit Evaluation</h3>
+                            <p class="text-gray-600">The registrar will assess which subjects can be credited to your new curriculum.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
+                            3
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Enrollment Access</h3>
+                            <p class="text-gray-600">Once evaluation is complete, you can enroll in subjects through the portal.</p>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-600 rounded">
+                    <p class="text-sm text-blue-800">
+                        <strong>Note:</strong> You can log in to your account now, but enrollment will be available after the registrar completes your credit evaluation.
+                    </p>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Action Buttons -->
             <div class="text-center space-x-4">
+                <a href="{% url 'login' %}" class="inline-block bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition shadow-lg">
+                    Login Now
+                </a>
                 <a href="{% url 'home' %}" class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
                     Return to Home
                 </a>
                 <button onclick="window.print()" class="inline-block bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-700 transition">
-                    Print Summary
+                    Print This Page
                 </button>
             </div>
 

@@ -15,7 +15,7 @@ import string
 
 
 def admission_form_view(request):
-    """Public admission form"""
+    """Public admission form - automatically creates student account"""
     # Check if admission is enabled
     admission_enabled = Setting.get_bool('admission_link_enabled', default=True)
 
@@ -25,9 +25,67 @@ def admission_form_view(request):
     if request.method == 'POST':
         form = AdmissionApplicationForm(request.POST)
         if form.is_valid():
-            application = form.save()
-            messages.success(request, 'Your application has been submitted successfully!')
-            return redirect('admission:confirmation', pk=application.pk)
+            with transaction.atomic():
+                # Save the application
+                application = form.save(commit=False)
+
+                # Generate username
+                base_username = f"{application.first_name.lower()}.{application.last_name.lower()}"
+                username = base_username
+                counter = 1
+                while User.objects.filter(username=username).exists():
+                    username = f"{base_username}{counter}"
+                    counter += 1
+
+                # Generate random password
+                password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+
+                # Create User account
+                user = User.objects.create_user(
+                    username=username,
+                    email=application.email,
+                    password=password,
+                    first_name=application.first_name,
+                    last_name=application.last_name,
+                    role='student'
+                )
+
+                # Get active curriculum for the program
+                curriculum = application.program.curricula.filter(active=True).first()
+
+                if not curriculum:
+                    messages.error(request, 'No active curriculum found for the selected program. Please contact admissions.')
+                    user.delete()
+                    return redirect('admission:apply')
+
+                # Create Student record
+                student = Student.objects.create(
+                    user=user,
+                    program=application.program,
+                    curriculum=curriculum,
+                    status='active'
+                )
+
+                # Set review flag for transferees
+                if application.applicant_type == 'transferee':
+                    application.needs_registrar_review = True
+                else:
+                    # Auto-enroll freshmen
+                    auto_enroll_freshman(student)
+
+                # Link generated user to application
+                application.generated_user = user
+                application.save()
+
+                # Store credentials in session for confirmation page
+                request.session['admission_credentials'] = {
+                    'username': username,
+                    'password': password,
+                    'application_id': application.pk
+                }
+
+                messages.success(request, 'Your account has been created successfully!')
+                return redirect('admission:confirmation', pk=application.pk)
     else:
         form = AdmissionApplicationForm()
 
@@ -35,9 +93,23 @@ def admission_form_view(request):
 
 
 def admission_confirmation_view(request, pk):
-    """Confirmation page after application submission"""
+    """Confirmation page showing generated credentials"""
     application = get_object_or_404(AdmissionApplication, pk=pk)
-    return render(request, 'admission/confirmation.html', {'application': application})
+
+    # Retrieve credentials from session
+    credentials = request.session.get('admission_credentials', {})
+
+    # Clear credentials from session after displaying
+    if 'admission_credentials' in request.session:
+        del request.session['admission_credentials']
+
+    context = {
+        'application': application,
+        'username': credentials.get('username'),
+        'password': credentials.get('password'),
+    }
+
+    return render(request, 'admission/confirmation.html', context)
 
 
 @login_required

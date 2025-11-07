@@ -11,12 +11,6 @@ class AdmissionApplication(models.Model):
         ('transferee', 'Transferee'),
     ]
 
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-    ]
-
     # Personal Information
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -34,25 +28,23 @@ class AdmissionApplication(models.Model):
     previous_school = models.CharField(max_length=255, blank=True, null=True)
     credits_earned = models.IntegerField(null=True, blank=True, help_text="Number of units completed")
 
-    # Status
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    # Status - kept for record-keeping only
     application_date = models.DateTimeField(auto_now_add=True)
-    processed_date = models.DateTimeField(null=True, blank=True)
-    processed_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='processed_applications'
+
+    # For Transferees - flag for registrar TOR validation
+    needs_registrar_review = models.BooleanField(
+        default=False,
+        help_text="Transferee applications need registrar review for TOR validation"
     )
 
-    # Generated User (after approval)
+    # Auto-generated User account
     generated_user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='admission_application'
+        related_name='admission_application',
+        help_text="System-generated user account (created automatically)"
     )
 
     # Documents
@@ -64,7 +56,8 @@ class AdmissionApplication(models.Model):
         ordering = ['-application_date']
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} - {self.get_applicant_type_display()} ({self.status})"
+        review_status = " [Needs Review]" if self.needs_registrar_review else ""
+        return f"{self.first_name} {self.last_name} - {self.get_applicant_type_display()}{review_status}"
 
     @property
     def full_name(self):
