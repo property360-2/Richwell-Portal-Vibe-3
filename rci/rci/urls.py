@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
+from . import admin as admin_config  # Import admin configuration
 
 urlpatterns = [
     path("admin/", admin.site.urls),
