@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Enrollment Closed - Richwell School Portal{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-16">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-12 text-center">
+        <div class="inline-block bg-yellow-100 rounded-full p-6 mb-6">
+            <svg class="w-16 h-16 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Enrollment is Currently Closed</h1>
+        <p class="text-gray-600 mb-6 text-lg">
+            The enrollment period is not currently active. Please check back during the enrollment period or contact the registrar's office for more information.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-8 text-left">
+            <p class="text-sm text-blue-900 font-semibold mb-2">Need to enroll?</p>
+            <p class="text-sm text-gray-700">
+                Contact the registrar's office at <strong>registrar@richwell.edu</strong> or visit the administration building during office hours.
+            </p>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+            Return to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

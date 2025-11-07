@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate of Registration - Richwell School Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Print Button -->
+        <div class="no-print mb-4 text-right">
+            <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 mr-2">
+                Print COR
+            </button>
+            <a href="{% url 'enrollment:home' %}" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
+                Back to Enrollment
+            </a>
+        </div>
+
+        <!-- COR Document -->
+        <div class="bg-white shadow-2xl rounded-lg p-8 max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="text-center border-b-4 border-blue-600 pb-6 mb-6">
+                <h1 class="text-3xl font-bold text-blue-900 mb-2">RICHWELL SCHOOL PORTAL</h1>
+                <h2 class="text-xl font-semibold text-gray-700">CERTIFICATE OF REGISTRATION</h2>
+                <p class="text-gray-600 mt-2">{{ term.name }}</p>
+            </div>
+
+            <!-- Student Information -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <p class="text-sm text-gray-600">Student Name</p>
+                    <p class="font-semibold text-gray-800">{{ student.user.get_full_name|upper }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Student ID</p>
+                    <p class="font-semibold text-gray-800">{{ student.user.username|upper }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Program</p>
+                    <p class="font-semibold text-gray-800">{{ student.program.name }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Curriculum</p>
+                    <p class="font-semibold text-gray-800">{{ student.curriculum.version }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Email</p>
+                    <p class="font-semibold text-gray-800">{{ student.user.email }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Date Issued</p>
+                    <p class="font-semibold text-gray-800">{% now "F d, Y" %}</p>
+                </div>
+            </div>
+
+            <!-- Term Information -->
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-blue-900 font-semibold">Term Period</p>
+                        <p class="text-gray-800">{{ term.start_date|date:"M d, Y" }} - {{ term.end_date|date:"M d, Y" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-blue-900 font-semibold">Add/Drop Deadline</p>
+                        <p class="text-gray-800">{{ term.add_drop_deadline|date:"F d, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enrolled Subjects -->
+            <h3 class="text-lg font-bold text-gray-800 mb-4">ENROLLED SUBJECTS</h3>
+
+            {% if enrolled_subjects %}
+            <table class="w-full border-collapse mb-6">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="border border-gray-300 px-4 py-2 text-left text-sm font-semibold">Subject Code</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-sm font-semibold">Description</th>
+                        <th class="border border-gray-300 px-4 py-2 text-center text-sm font-semibold">Units</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-sm font-semibold">Section</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left text-sm font-semibold">Professor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in enrolled_subjects %}
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2 font-semibold">{{ enrollment.subject.code }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ enrollment.subject.title }}</td>
+                        <td class="border border-gray-300 px-4 py-2 text-center">{{ enrollment.subject.units }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ enrollment.section.section_code }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ enrollment.professor.get_full_name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="bg-gray-100 font-bold">
+                        <td colspan="2" class="border border-gray-300 px-4 py-2 text-right">TOTAL UNITS:</td>
+                        <td class="border border-gray-300 px-4 py-2 text-center">{{ total_units }}</td>
+                        <td colspan="2" class="border border-gray-300"></td>
+                    </tr>
+                </tfoot>
+            </table>
+            {% else %}
+            <div class="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg mb-6">
+                <p class="text-gray-500">No subjects enrolled for this term</p>
+            </div>
+            {% endif %}
+
+            <!-- Signatures -->
+            <div class="grid grid-cols-2 gap-8 mt-12 pt-8 border-t-2 border-gray-200">
+                <div class="text-center">
+                    <div class="border-t-2 border-gray-800 pt-2 mt-12">
+                        <p class="font-semibold">{{ student.user.get_full_name }}</p>
+                        <p class="text-sm text-gray-600">Student Signature</p>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="border-t-2 border-gray-800 pt-2 mt-12">
+                        <p class="font-semibold">REGISTRAR</p>
+                        <p class="text-sm text-gray-600">Authorized Signature</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-8 text-center text-xs text-gray-500">
+                <p>This is an official document from Richwell School Portal</p>
+                <p>Issued on {% now "F d, Y h:i A" %}</p>
+            </div>
+        </div>
+
+        <!-- Back Button (No Print) -->
+        <div class="no-print mt-6 text-center">
+            <a href="{% url 'enrollment:home' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
+                ← Back to Enrollment
+            </a>
+        </div>
+    </div>
+</body>
+</html>
