@@ -171,6 +171,171 @@ def enrollment_home_view(request):
 
 
 @login_required
+def auto_enroll_view(request):
+    """Automatically enroll student in recommended subjects"""
+    if request.method != 'POST':
+        return redirect('enrollment:home')
+
+    # Only students can auto-enroll
+    if request.user.role != 'student':
+        messages.error(request, 'Only students can use auto-enrollment.')
+        return redirect('dashboard')
+
+    # Check if enrollment is open
+    enrollment_open = Setting.get_bool('enrollment_open', default=True)
+    if not enrollment_open:
+        messages.error(request, 'Enrollment is currently closed.')
+        return redirect('enrollment:home')
+
+    # Get student profile
+    try:
+        student = Student.objects.get(user=request.user)
+    except Student.DoesNotExist:
+        messages.error(request, 'Student profile not found.')
+        return redirect('dashboard')
+
+    # Get active term
+    active_term = Term.objects.filter(is_active=True).first()
+    if not active_term:
+        messages.error(request, 'No active enrollment term.')
+        return redirect('enrollment:home')
+
+    # Get unit cap
+    unit_cap = Setting.get_int('freshman_unit_cap', default=30)
+
+    # Calculate current enrolled units
+    current_units = StudentSubject.objects.filter(
+        student=student,
+        term=active_term,
+        status='enrolled'
+    ).aggregate(total=Sum('subject__units'))['total'] or 0
+
+    # Get student's year level
+    completed_units = StudentSubject.objects.filter(
+        student=student,
+        status='completed'
+    ).aggregate(total=Sum('subject__units'))['total'] or 0
+    estimated_year = min((completed_units // 30) + 1, 4)
+
+    # Determine current semester (you can make this dynamic based on term name/dates)
+    # For now, assuming semester 1
+    current_semester = 1
+    if 'second' in active_term.name.lower() or '2nd' in active_term.name.lower():
+        current_semester = 2
+
+    # Get recommended subjects for this year and semester
+    recommended_subjects = CurriculumSubject.objects.filter(
+        curriculum=student.curriculum,
+        year_level=estimated_year,
+        term_no=current_semester,
+        is_recommended=True
+    ).select_related('subject').order_by('subject__code')
+
+    enrolled_count = 0
+    skipped_subjects = []
+    enrolled_subjects = []
+
+    with transaction.atomic():
+        for curr_subject in recommended_subjects:
+            subject = curr_subject.subject
+
+            # Check if would exceed unit cap
+            if current_units + subject.units > unit_cap:
+                skipped_subjects.append({
+                    'subject': subject,
+                    'reason': f'Would exceed unit cap ({unit_cap} units)'
+                })
+                continue
+
+            # Check if already enrolled
+            already_enrolled = StudentSubject.objects.filter(
+                student=student,
+                subject=subject,
+                term=active_term,
+                status='enrolled'
+            ).exists()
+            if already_enrolled:
+                continue
+
+            # Check if already completed
+            already_completed = StudentSubject.objects.filter(
+                student=student,
+                subject=subject,
+                status='completed'
+            ).exists()
+            if already_completed:
+                continue
+
+            # Check prerequisites
+            prereqs_met, missing_prereqs = check_prerequisites(student, subject)
+            if not prereqs_met:
+                prereq_names = ', '.join([p.code for p in missing_prereqs])
+                skipped_subjects.append({
+                    'subject': subject,
+                    'reason': f'Missing prerequisites: {prereq_names}'
+                })
+                continue
+
+            # Get first available section with capacity
+            available_section = Section.objects.filter(
+                subject=subject,
+                term=active_term,
+                status='open'
+            ).select_related('professor').first()
+
+            if not available_section:
+                skipped_subjects.append({
+                    'subject': subject,
+                    'reason': 'No available sections'
+                })
+                continue
+
+            if available_section.is_full:
+                skipped_subjects.append({
+                    'subject': subject,
+                    'reason': 'All sections are full'
+                })
+                continue
+
+            # Enroll the student
+            StudentSubject.objects.create(
+                student=student,
+                subject=subject,
+                term=active_term,
+                section=available_section,
+                professor=available_section.professor,
+                status='enrolled'
+            )
+
+            enrolled_subjects.append({
+                'subject': subject,
+                'section': available_section
+            })
+            current_units += subject.units
+            enrolled_count += 1
+
+    # Show success messages
+    if enrolled_count > 0:
+        enrolled_list = ', '.join([f"{e['subject'].code}" for e in enrolled_subjects])
+        messages.success(
+            request,
+            f'Successfully auto-enrolled in {enrolled_count} subject(s): {enrolled_list}'
+        )
+
+    if skipped_subjects:
+        for skipped in skipped_subjects:
+            messages.warning(
+                request,
+                f'Skipped {skipped["subject"].code}: {skipped["reason"]}'
+            )
+
+    if enrolled_count == 0 and not skipped_subjects:
+        messages.info(request, 'No recommended subjects available for auto-enrollment.')
+
+    return redirect('enrollment:home')
+
+
+@login_required
 def enroll_subject_view(request, section_id):
     """Enroll student in a subject section"""
     if request.method != 'POST':
