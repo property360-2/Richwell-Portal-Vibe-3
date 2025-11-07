@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Enrollments Overview{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Enrollments Overview</h1>
+
+    <!-- Filters and Search -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <form method="get" class="grid grid-cols-3 gap-4">
+            <input type="text" name="search" placeholder="Search by student name or ID..." value="{{ search }}" class="px-3 py-2 border rounded-lg">
+            <select name="term" class="px-3 py-2 border rounded-lg">
+                <option value="">All Terms</option>
+                {% for term in terms %}
+                <option value="{{ term.id }}" {% if term.id|stringformat:"s" == selected_term %}selected{% endif %}>{{ term.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Filter</button>
+        </form>
+    </div>
+
+    <!-- Enrollments Count -->
+    <div class="bg-blue-50 p-4 rounded-lg mb-6">
+        <p class="text-lg">Showing <span class="font-bold text-blue-600">{{ enrollments.count }}</span> recent enrollments</p>
+    </div>
+
+    <!-- Enrollments Table -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-gray-50">
+                    <th class="text-left py-3 px-4">Student</th>
+                    <th class="text-left py-3 px-4">Student ID</th>
+                    <th class="text-left py-3 px-4">Subject</th>
+                    <th class="text-left py-3 px-4">Section</th>
+                    <th class="text-left py-3 px-4">Term</th>
+                    <th class="text-center py-3 px-4">Units</th>
+                    <th class="text-center py-3 px-4">Enrolled On</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for enrollment in enrollments %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4 font-semibold">
+                        <a href="{% url 'staff:student_detail' enrollment.student.id %}" class="text-blue-600 hover:text-blue-800">
+                            {{ enrollment.student.user.get_full_name }}
+                        </a>
+                    </td>
+                    <td class="py-3 px-4 font-mono text-xs">{{ enrollment.student.student_id }}</td>
+                    <td class="py-3 px-4">{{ enrollment.subject.code }} - {{ enrollment.subject.title }}</td>
+                    <td class="py-3 px-4">{{ enrollment.section.section_code }}</td>
+                    <td class="py-3 px-4">{{ enrollment.term.name }}</td>
+                    <td class="py-3 px-4 text-center font-semibold">{{ enrollment.subject.units }}</td>
+                    <td class="py-3 px-4 text-center text-xs">{{ enrollment.created_at|date:"M d, Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="py-12 text-center text-gray-500">No enrollments found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 text-sm text-gray-600">
+        <p>Note: Showing the most recent 100 enrollments. Use filters to narrow down the results.</p>
+    </div>
+</div>
+{% endblock %}

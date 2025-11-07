@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Application Details - {{ application.first_name }} {{ application.last_name }}{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <a href="{% url 'staff:applications_list' %}" class="text-blue-600 hover:text-blue-800 font-semibold mb-4 inline-block">← Back to Applications</a>
+
+    <h1 class="text-3xl font-bold mb-6">Application Details</h1>
+
+    <!-- Status Badge -->
+    <div class="mb-6">
+        <span class="px-4 py-2 rounded-full text-lg font-semibold {% if application.status == 'approved' %}bg-green-100 text-green-800{% elif application.status == 'rejected' %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+            Status: {{ application.get_status_display }}
+        </span>
+    </div>
+
+    <!-- Personal Information -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">Personal Information</h2>
+        <div class="grid grid-cols-2 gap-6">
+            <div>
+                <p class="text-sm text-gray-600">First Name</p>
+                <p class="font-bold text-lg">{{ application.first_name }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Last Name</p>
+                <p class="font-bold text-lg">{{ application.last_name }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Email</p>
+                <p class="font-semibold">{{ application.email }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Date of Birth</p>
+                <p class="font-semibold">{{ application.date_of_birth|date:"F d, Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Information -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">Academic Information</h2>
+        <div class="grid grid-cols-2 gap-6">
+            <div>
+                <p class="text-sm text-gray-600">Student Type</p>
+                <p class="font-bold text-lg">
+                    <span class="px-3 py-1 rounded-full {% if application.student_type == 'freshman' %}bg-blue-100 text-blue-800{% else %}bg-purple-100 text-purple-800{% endif %}">
+                        {{ application.get_student_type_display }}
+                    </span>
+                </p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Program</p>
+                <p class="font-bold text-lg">{{ application.program.name }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Information -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">Address</h2>
+        <p class="text-lg">{{ application.address }}</p>
+    </div>
+
+    <!-- Submission Details -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Submission Details</h2>
+        <div class="grid grid-cols-2 gap-6">
+            <div>
+                <p class="text-sm text-gray-600">Submitted On</p>
+                <p class="font-semibold">{{ application.submitted_at|date:"F d, Y H:i" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Last Updated</p>
+                <p class="font-semibold">{{ application.updated_at|date:"F d, Y H:i" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
