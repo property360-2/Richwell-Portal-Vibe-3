@@ -43,6 +43,32 @@ class Command(BaseCommand):
         registrar_user.set_password('registrar123')
         registrar_user.save()
 
+        admission_user, _ = User.objects.get_or_create(
+            username='admission',
+            defaults={
+                'email': 'admission@richwell.edu',
+                'role': 'admission',
+                'is_staff': True,
+                'first_name': 'Maria',
+                'last_name': 'Gonzales'
+            }
+        )
+        admission_user.set_password('admission123')
+        admission_user.save()
+
+        dean_user, _ = User.objects.get_or_create(
+            username='dean',
+            defaults={
+                'email': 'dean@richwell.edu',
+                'role': 'dean',
+                'is_staff': True,
+                'first_name': 'Roberto',
+                'last_name': 'Fernandez'
+            }
+        )
+        dean_user.set_password('dean123')
+        dean_user.save()
+
         prof1, _ = User.objects.get_or_create(
             username='prof_cruz',
             defaults={
@@ -340,7 +366,9 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Data seeding completed successfully!'))
         self.stdout.write(self.style.SUCCESS('='*60))
         self.stdout.write('\nTest Credentials:')
-        self.stdout.write('  Admin:     username: admin     password: admin123')
-        self.stdout.write('  Registrar: username: registrar password: registrar123')
-        self.stdout.write('  Professor: username: prof_cruz password: prof123')
-        self.stdout.write('  Student:   username: student_dela_cruz password: student123')
+        self.stdout.write('  Admin:      username: admin              password: admin123')
+        self.stdout.write('  Registrar:  username: registrar          password: registrar123')
+        self.stdout.write('  Admission:  username: admission          password: admission123')
+        self.stdout.write('  Dean:       username: dean               password: dean123')
+        self.stdout.write('  Professor:  username: prof_cruz          password: prof123')
+        self.stdout.write('  Student:    username: student_dela_cruz password: student123')
