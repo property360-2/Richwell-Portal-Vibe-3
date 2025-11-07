@@ -23,29 +23,31 @@
 
         {% if user.role == 'student' %}
             <!-- Student Dashboard -->
+            {% if error %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+                {{ error }}
+            </div>
+            {% endif %}
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Enrollment Status Card -->
+                <!-- Enrolled Subjects Card -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">Enrollment</h2>
+                        <h2 class="text-xl font-semibold text-gray-800">Enrolled</h2>
                         <span class="text-3xl">📚</span>
                     </div>
-                    <p class="text-gray-600 mb-4">Current enrollment status and subject registration</p>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
-                        View Enrollment
-                    </button>
+                    <p class="text-3xl font-bold text-blue-600 mb-2">{{ enrolled_subjects.count|default:0 }}</p>
+                    <p class="text-gray-600">Current Subjects</p>
                 </div>
 
-                <!-- Grades Card -->
+                <!-- Completed Subjects Card -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">My Grades</h2>
-                        <span class="text-3xl">📊</span>
+                        <h2 class="text-xl font-semibold text-gray-800">Completed</h2>
+                        <span class="text-3xl">✅</span>
                     </div>
-                    <p class="text-gray-600 mb-4">View your academic performance and grades</p>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
-                        View Grades
-                    </button>
+                    <p class="text-3xl font-bold text-green-600 mb-2">{{ completed_count|default:0 }}</p>
+                    <p class="text-gray-600">Subjects Passed</p>
                 </div>
 
                 <!-- Profile Card -->
@@ -54,52 +56,116 @@
                         <h2 class="text-xl font-semibold text-gray-800">Profile</h2>
                         <span class="text-3xl">👤</span>
                     </div>
-                    <p class="text-gray-600 mb-4">Update your personal information</p>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
-                        Edit Profile
-                    </button>
+                    <p class="text-gray-600 mb-4">View your academic information</p>
+                    <a href="{% url 'profile' %}" class="block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center">
+                        View Profile
+                    </a>
                 </div>
             </div>
+
+            <!-- Enrolled Subjects List -->
+            {% if enrolled_subjects %}
+            <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Currently Enrolled Subjects</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Subject Code</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Title</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Section</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Units</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Term</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in enrolled_subjects %}
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-3">{{ enrollment.subject.code }}</td>
+                                <td class="px-4 py-3">{{ enrollment.subject.title }}</td>
+                                <td class="px-4 py-3">{{ enrollment.section.section_code }}</td>
+                                <td class="px-4 py-3">{{ enrollment.subject.units }}</td>
+                                <td class="px-4 py-3">{{ enrollment.term.name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
 
         {% elif user.role == 'professor' %}
             <!-- Professor Dashboard -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- My Classes Card -->
+                <!-- My Sections Card -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">My Classes</h2>
+                        <h2 class="text-xl font-semibold text-gray-800">My Sections</h2>
                         <span class="text-3xl">🏫</span>
                     </div>
-                    <p class="text-gray-600 mb-4">View your assigned sections and students</p>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
-                        View Classes
-                    </button>
+                    <p class="text-3xl font-bold text-blue-600 mb-2">{{ sections.count|default:0 }}</p>
+                    <p class="text-gray-600">Active Sections</p>
+                </div>
+
+                <!-- Total Students Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Students</h2>
+                        <span class="text-3xl">👥</span>
+                    </div>
+                    <p class="text-3xl font-bold text-green-600 mb-2">{{ total_students|default:0 }}</p>
+                    <p class="text-gray-600">Total Enrolled</p>
                 </div>
 
                 <!-- Grade Submission Card -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">Submit Grades</h2>
+                        <h2 class="text-xl font-semibold text-gray-800">Actions</h2>
                         <span class="text-3xl">✍️</span>
                     </div>
-                    <p class="text-gray-600 mb-4">Enter and submit student grades</p>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
-                        Grade Students
-                    </button>
-                </div>
-
-                <!-- Schedule Card -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">Schedule</h2>
-                        <span class="text-3xl">📅</span>
-                    </div>
-                    <p class="text-gray-600 mb-4">View your teaching schedule</p>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
-                        View Schedule
-                    </button>
+                    <p class="text-gray-600 mb-4">Grade submission & class management</p>
+                    <a href="{% url 'profile' %}" class="block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center">
+                        View Profile
+                    </a>
                 </div>
             </div>
+
+            <!-- My Sections List -->
+            {% if sections %}
+            <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">My Teaching Sections</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Section Code</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Subject</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Term</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Enrolled</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Capacity</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for section in sections %}
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-3 font-semibold">{{ section.section_code }}</td>
+                                <td class="px-4 py-3">{{ section.subject.code }} - {{ section.subject.title }}</td>
+                                <td class="px-4 py-3">{{ section.term.name }}</td>
+                                <td class="px-4 py-3">{{ section.enrolled_count }}</td>
+                                <td class="px-4 py-3">{{ section.capacity }}</td>
+                                <td class="px-4 py-3">
+                                    <span class="px-3 py-1 rounded-full text-sm {% if section.status == 'open' %}bg-green-100 text-green-800{% elif section.status == 'full' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ section.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
 
         {% elif user.role == 'registrar' or user.role == 'dean' or user.role == 'admin' %}
             <!-- Registrar/Dean/Admin Dashboard -->
@@ -110,17 +176,17 @@
                         <h2 class="text-xl font-semibold text-gray-800">Students</h2>
                         <span class="text-3xl">👨‍🎓</span>
                     </div>
-                    <p class="text-3xl font-bold text-blue-600 mb-2">0</p>
-                    <p class="text-gray-600">Total Students</p>
+                    <p class="text-3xl font-bold text-blue-600 mb-2">{{ total_students|default:0 }}</p>
+                    <p class="text-gray-600">Active Students</p>
                 </div>
 
                 <!-- Enrollment Card -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">Enrollment</h2>
+                        <h2 class="text-xl font-semibold text-gray-800">Enrollments</h2>
                         <span class="text-3xl">📝</span>
                     </div>
-                    <p class="text-3xl font-bold text-green-600 mb-2">0</p>
+                    <p class="text-3xl font-bold text-green-600 mb-2">{{ total_enrollments|default:0 }}</p>
                     <p class="text-gray-600">Active Enrollments</p>
                 </div>
 
@@ -130,35 +196,37 @@
                         <h2 class="text-xl font-semibold text-gray-800">Sections</h2>
                         <span class="text-3xl">🏛️</span>
                     </div>
-                    <p class="text-3xl font-bold text-purple-600 mb-2">0</p>
+                    <p class="text-3xl font-bold text-purple-600 mb-2">{{ total_sections|default:0 }}</p>
                     <p class="text-gray-600">Total Sections</p>
                 </div>
 
-                <!-- Reports Card -->
+                <!-- Subjects Card -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">Reports</h2>
-                        <span class="text-3xl">📊</span>
+                        <h2 class="text-xl font-semibold text-gray-800">Subjects</h2>
+                        <span class="text-3xl">📚</span>
                     </div>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
-                        Generate Report
-                    </button>
+                    <p class="text-3xl font-bold text-indigo-600 mb-2">{{ total_subjects|default:0 }}</p>
+                    <p class="text-gray-600">Active Subjects</p>
                 </div>
             </div>
 
             <!-- Quick Actions -->
             <div class="mt-6 bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
-                        + Add Student
-                    </button>
-                    <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                        Manage Enrollment
-                    </button>
-                    <button class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition">
-                        Settings
-                    </button>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <a href="{% url 'admin:index' %}" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition text-center">
+                        Admin Panel
+                    </a>
+                    <a href="{% url 'admin:enrollment_student_changelist' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition text-center">
+                        Manage Students
+                    </a>
+                    <a href="{% url 'admin:enrollment_section_changelist' %}" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition text-center">
+                        Manage Sections
+                    </a>
+                    <a href="{% url 'admin:settingsapp_setting_changelist' %}" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition text-center">
+                        System Settings
+                    </a>
                 </div>
             </div>
 
@@ -171,30 +239,44 @@
                         <h2 class="text-xl font-semibold text-gray-800">Applications</h2>
                         <span class="text-3xl">📋</span>
                     </div>
-                    <p class="text-3xl font-bold text-blue-600 mb-2">0</p>
+                    <p class="text-3xl font-bold text-blue-600 mb-2">{{ pending_applications|default:0 }}</p>
                     <p class="text-gray-600">Pending Applications</p>
                 </div>
 
-                <!-- Approved Card -->
+                <!-- Total Students Card -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">Approved</h2>
-                        <span class="text-3xl">✅</span>
+                        <h2 class="text-xl font-semibold text-gray-800">Students</h2>
+                        <span class="text-3xl">👥</span>
                     </div>
-                    <p class="text-3xl font-bold text-green-600 mb-2">0</p>
-                    <p class="text-gray-600">Approved Today</p>
+                    <p class="text-3xl font-bold text-green-600 mb-2">{{ total_students|default:0 }}</p>
+                    <p class="text-gray-600">Total Students</p>
                 </div>
 
-                <!-- Settings Card -->
+                <!-- Active Students Card -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-800">Settings</h2>
-                        <span class="text-3xl">⚙️</span>
+                        <h2 class="text-xl font-semibold text-gray-800">Active</h2>
+                        <span class="text-3xl">✅</span>
                     </div>
-                    <p class="text-gray-600 mb-4">Manage admission settings</p>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full">
-                        Configure
-                    </button>
+                    <p class="text-3xl font-bold text-indigo-600 mb-2">{{ active_students|default:0 }}</p>
+                    <p class="text-gray-600">Active Students</p>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <a href="{% url 'admin:enrollment_student_changelist' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition text-center">
+                        View Students
+                    </a>
+                    <a href="{% url 'admin:settingsapp_setting_changelist' %}" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition text-center">
+                        Admission Settings
+                    </a>
+                    <a href="{% url 'profile' %}" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition text-center">
+                        My Profile
+                    </a>
                 </div>
             </div>
         {% endif %}
@@ -214,18 +296,18 @@
             <div class="bg-white rounded-lg shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Student & Staff Login</h2>
                 <p class="text-gray-600 mb-6">Access your account to view grades, enroll in courses, and more.</p>
-                <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition w-full">
+                <a href="{% url 'login' %}" class="block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition text-center">
                     Login
-                </button>
+                </a>
             </div>
 
             <!-- Apply Card -->
             <div class="bg-white rounded-lg shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Apply for Admission</h2>
                 <p class="text-gray-600 mb-6">Start your journey with us. Apply online for freshman or transferee admission.</p>
-                <button class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition w-full">
+                <a href="#" class="block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition text-center">
                     Apply Now
-                </button>
+                </a>
             </div>
         </div>
     {% endif %}

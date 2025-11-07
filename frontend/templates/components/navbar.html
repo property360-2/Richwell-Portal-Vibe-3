@@ -40,14 +40,16 @@
                              @click.away="open = false"
                              x-transition
                              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Profile</a>
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Settings</a>
+                            <a href="{% url 'profile' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Profile</a>
+                            {% if user.is_staff %}
+                            <a href="{% url 'admin:index' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Admin Panel</a>
+                            {% endif %}
                             <hr class="my-2">
-                            <a href="#" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                            <a href="{% url 'logout' %}" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
                         </div>
                     </div>
                 {% else %}
-                    <a href="#" class="text-white hover:text-blue-200 transition">Login</a>
+                    <a href="{% url 'login' %}" class="text-white hover:text-blue-200 transition">Login</a>
                     <a href="#" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition">Apply Now</a>
                 {% endif %}
             </div>
@@ -74,11 +76,13 @@
                     <a href="#" class="block py-2 text-white hover:text-blue-200">Grade Submission</a>
                 {% endif %}
                 <hr class="my-2 border-blue-500">
-                <a href="#" class="block py-2 text-white hover:text-blue-200">Profile</a>
-                <a href="#" class="block py-2 text-white hover:text-blue-200">Settings</a>
-                <a href="#" class="block py-2 text-red-300 hover:text-red-100">Logout</a>
+                <a href="{% url 'profile' %}" class="block py-2 text-white hover:text-blue-200">Profile</a>
+                {% if user.is_staff %}
+                <a href="{% url 'admin:index' %}" class="block py-2 text-white hover:text-blue-200">Admin Panel</a>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="block py-2 text-red-300 hover:text-red-100">Logout</a>
             {% else %}
-                <a href="#" class="block py-2 text-white hover:text-blue-200">Login</a>
+                <a href="{% url 'login' %}" class="block py-2 text-white hover:text-blue-200">Login</a>
                 <a href="#" class="block py-2 text-white hover:text-blue-200">Apply Now</a>
             {% endif %}
         </div>
