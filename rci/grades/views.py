@@ -229,17 +229,17 @@ def student_grades_view(request):
         })
 
         # Calculate units and GPA
-        terms_data[term_name]['total_units'] += enrollment.subject.units
+        terms_data[term_name]['total_units'] += float(enrollment.subject.units)
 
         if grade_obj:
             if enrollment.status == 'completed':
-                terms_data[term_name]['completed_units'] += enrollment.subject.units
+                terms_data[term_name]['completed_units'] += float(enrollment.subject.units)
 
             # Calculate GPA (only for numeric grades)
             try:
                 grade_value = float(grade_obj.grade)
                 terms_data[term_name]['gpa_points'] += grade_value * float(enrollment.subject.units)
-                terms_data[term_name]['gpa_units'] += enrollment.subject.units
+                terms_data[term_name]['gpa_units'] += float(enrollment.subject.units)
             except ValueError:
                 pass  # Non-numeric grade (INC, DRP)
 
