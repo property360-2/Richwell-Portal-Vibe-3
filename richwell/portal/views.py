@@ -131,6 +131,36 @@ def student_dashboard(request):
 
 
 @login_required
+def student_profile(request):
+    """
+    Student profile - manage personal information and documents
+    """
+    if not request.user.is_student():
+        messages.error(request, 'Access denied: Students only')
+        return redirect('dashboard')
+
+    from .models import Student
+
+    try:
+        student = Student.objects.get(user=request.user)
+    except Student.DoesNotExist:
+        messages.error(request, 'Student profile not found. Please contact the registrar.')
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        # Handle profile update
+        # This is a placeholder for future implementation
+        messages.success(request, 'Profile update feature coming soon!')
+        return redirect('student_profile')
+
+    context = {
+        'student': student,
+    }
+
+    return render(request, 'portal/student_profile.html', context)
+
+
+@login_required
 def professor_dashboard(request):
     """
     Professor dashboard - view assigned sections and manage grades
@@ -262,7 +292,7 @@ def admission_dashboard(request):
 
     # Get students by program
     program_stats = Program.objects.annotate(
-        student_count=Count('student')
+        student_count=Count('students')
     ).order_by('name')
 
     context = {

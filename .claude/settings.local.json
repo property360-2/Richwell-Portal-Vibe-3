@@ -8,7 +8,11 @@
       "Bash(nul)",
       "Bash(\".venv/Scripts/python.exe\" manage.py runserver)",
       "Bash(curl:*)",
-      "Bash(\".venv/Scripts/python.exe\" manage.py runserver --noreload)"
+      "Bash(\".venv/Scripts/python.exe\" manage.py runserver --noreload)",
+      "Bash(\".venv/Scripts/python.exe\" manage.py seed_data)",
+      "Bash(/tmp/login_page.html)",
+      "Bash(cat:*)",
+      "Bash(\".venv/Scripts/python.exe\" test_admission.py)"
     ],
     "deny": [],
     "ask": []

@@ -48,8 +48,8 @@ class Command(BaseCommand):
             # 10. Create Sample Students
             self.create_students(student1, student2, cs_program, it_program, cs_curriculum, it_curriculum)
 
-        self.stdout.write(self.style.SUCCESS('\n✅ Data seeding completed successfully!'))
-        self.stdout.write(self.style.WARNING('\n📋 Default Login Credentials:'))
+        self.stdout.write(self.style.SUCCESS('\n[OK] Data seeding completed successfully!'))
+        self.stdout.write(self.style.WARNING('\n[INFO] Default Login Credentials:'))
         self.stdout.write('  Admin: admin / admin123')
         self.stdout.write('  Registrar: registrar / registrar123')
         self.stdout.write('  Dean: dean / dean123')
@@ -77,7 +77,7 @@ class Command(BaseCommand):
                 }
             )
 
-        self.stdout.write(self.style.SUCCESS(f'  ✓ Created {len(settings)} settings'))
+        self.stdout.write(self.style.SUCCESS(f'  [+] Created {len(settings)} settings'))
 
     def create_users(self):
         self.stdout.write('Creating users...')
@@ -192,7 +192,7 @@ class Command(BaseCommand):
             student2.set_password('student123')
             student2.save()
 
-        self.stdout.write(self.style.SUCCESS('  ✓ Created 8 users'))
+        self.stdout.write(self.style.SUCCESS('  [+] Created 8 users'))
 
         return admin, registrar, dean, admission, professor1, professor2, student1, student2
 
@@ -200,22 +200,24 @@ class Command(BaseCommand):
         self.stdout.write('Creating programs...')
 
         cs_program, created = Program.objects.get_or_create(
-            name='Bachelor of Science in Computer Science',
+            code='BSCS',
             defaults={
-                'level': 'undergraduate',
+                'name': 'Bachelor of Science in Computer Science',
+                'level': 'Bachelor',
                 'passing_grade': 3.00
             }
         )
 
         it_program, created = Program.objects.get_or_create(
-            name='Bachelor of Science in Information Technology',
+            code='BSIT',
             defaults={
-                'level': 'undergraduate',
+                'name': 'Bachelor of Science in Information Technology',
+                'level': 'Bachelor',
                 'passing_grade': 3.00
             }
         )
 
-        self.stdout.write(self.style.SUCCESS('  ✓ Created 2 programs'))
+        self.stdout.write(self.style.SUCCESS('  [+] Created 2 programs'))
 
         return cs_program, it_program
 
@@ -240,7 +242,7 @@ class Command(BaseCommand):
             }
         )
 
-        self.stdout.write(self.style.SUCCESS('  ✓ Created 2 curricula'))
+        self.stdout.write(self.style.SUCCESS('  [+] Created 2 curricula'))
 
         return cs_curriculum, it_curriculum
 
@@ -336,7 +338,7 @@ class Command(BaseCommand):
             }
         )
 
-        self.stdout.write(self.style.SUCCESS(f'  ✓ Created {len(subjects)} subjects'))
+        self.stdout.write(self.style.SUCCESS(f'  [+] Created {len(subjects)} subjects'))
 
         return subjects
 
@@ -381,7 +383,7 @@ class Command(BaseCommand):
             defaults={'year_level': 1, 'term_no': 1, 'is_recommended': True}
         )
 
-        self.stdout.write(self.style.SUCCESS('  ✓ Mapped curriculum subjects'))
+        self.stdout.write(self.style.SUCCESS('  [+] Mapped curriculum subjects'))
 
     def create_prerequisites(self, subjects):
         self.stdout.write('Creating prerequisites...')
@@ -392,7 +394,7 @@ class Command(BaseCommand):
             prereq_subject=subjects['cs102']
         )
 
-        self.stdout.write(self.style.SUCCESS('  ✓ Created prerequisites'))
+        self.stdout.write(self.style.SUCCESS('  [+] Created prerequisites'))
 
     def create_term(self):
         self.stdout.write('Creating academic term...')
@@ -414,7 +416,7 @@ class Command(BaseCommand):
             }
         )
 
-        self.stdout.write(self.style.SUCCESS('  ✓ Created active term'))
+        self.stdout.write(self.style.SUCCESS('  [+] Created active term'))
 
         return active_term
 
@@ -437,7 +439,7 @@ class Command(BaseCommand):
             )
             sections.append(section)
 
-        self.stdout.write(self.style.SUCCESS(f'  ✓ Created {len(sections)} sections'))
+        self.stdout.write(self.style.SUCCESS(f'  [+] Created {len(sections)} sections'))
 
         return sections
 
@@ -462,4 +464,4 @@ class Command(BaseCommand):
             }
         )
 
-        self.stdout.write(self.style.SUCCESS('  ✓ Created 2 student profiles'))
+        self.stdout.write(self.style.SUCCESS('  [+] Created 2 student profiles'))

@@ -12,6 +12,7 @@ urlpatterns = [
 
     # Role-specific dashboards
     path('student/', views.student_dashboard, name='student_dashboard'),
+    path('student/profile/', views.student_profile, name='student_profile'),
     path('professor/', views.professor_dashboard, name='professor_dashboard'),
     path('registrar/', views.registrar_dashboard, name='registrar_dashboard'),
     path('dean/', views.dean_dashboard, name='dean_dashboard'),
