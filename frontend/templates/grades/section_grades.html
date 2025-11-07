@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Grade Sheet - {{ section.subject.code }} - Richwell School Portal{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-6">
+        <a href="{% url 'grades:professor_sections' %}" class="text-blue-600 hover:text-blue-800 font-semibold mb-4 inline-block">
+            ← Back to My Sections
+        </a>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Grade Sheet</h1>
+        <p class="text-gray-600">{{section.subject.code}} - {{ section.subject.title }} ({{ section.section_code }})</p>
+    </div>
+
+    <!-- Section Info Card -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg p-6 text-white mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <p class="text-blue-100 text-sm">Subject</p>
+                <p class="text-xl font-bold">{{ section.subject.code }}</p>
+            </div>
+            <div>
+                <p class="text-blue-100 text-sm">Section</p>
+                <p class="text-xl font-bold">{{ section.section_code }}</p>
+            </div>
+            <div>
+                <p class="text-blue-100 text-sm">Term</p>
+                <p class="text-lg font-semibold">{{ term.name }}</p>
+            </div>
+            <div>
+                <p class="text-blue-100 text-sm">Encoding Deadline</p>
+                <p class="text-lg font-semibold">{{ term.grade_encoding_deadline|date:"M d, Y" }}</p>
+            </div>
+        </div>
+
+        {% if not can_encode %}
+        <div class="mt-4 p-3 bg-red-500/30 border border-red-300 rounded-lg">
+            <p class="text-sm font-semibold">Grade encoding deadline has passed. Contact the registrar to make changes.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Grade Sheet Table -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-100 border-b-2 border-gray-200">
+                        <th class="text-left py-4 px-4 text-gray-700 font-semibold">Student ID</th>
+                        <th class="text-left py-4 px-4 text-gray-700 font-semibold">Student Name</th>
+                        <th class="text-center py-4 px-4 text-gray-700 font-semibold">Current Grade</th>
+                        <th class="text-center py-4 px-4 text-gray-700 font-semibold">Status</th>
+                        {% if can_encode %}
+                        <th class="text-right py-4 px-4 text-gray-700 font-semibold">Action</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in student_data %}
+                    <tr class="border-b border-gray-100 hover:bg-gray-50" x-data="{ showForm: false }">
+                        <td class="py-3 px-4 font-mono text-sm">{{ item.student.user.username }}</td>
+                        <td class="py-3 px-4 font-semibold">{{ item.student.user.get_full_name }}</td>
+                        <td class="py-3 px-4 text-center">
+                            {% if item.grade %}
+                                <span class="text-lg font-bold
+                                    {% if item.grade.is_passing %}text-green-600
+                                    {% elif item.grade.is_incomplete %}text-yellow-600
+                                    {% else %}text-red-600{% endif %}">
+                                    {{ item.grade.grade }}
+                                </span>
+                                {% if item.grade.is_incomplete and item.grade.inc_expiration_date %}
+                                <div class="text-xs text-gray-500 mt-1">
+                                    Exp: {{ item.grade.inc_expiration_date|date:"M d, Y" }}
+                                    {% if item.grade.is_inc_expired %}
+                                    <span class="text-red-600 font-semibold">(EXPIRED)</span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-gray-400">No grade</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            {% if item.enrollment.status == 'enrolled' %}
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-semibold">Enrolled</span>
+                            {% elif item.enrollment.status == 'completed' %}
+                            <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-semibold">Completed</span>
+                            {% elif item.enrollment.status == 'inc' %}
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full font-semibold">INC</span>
+                            {% elif item.enrollment.status == 'failed' %}
+                            <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full font-semibold">Failed</span>
+                            {% elif item.enrollment.status == 'repeat_required' %}
+                            <span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full font-semibold">Repeat Required</span>
+                            {% endif %}
+                        </td>
+                        {% if can_encode %}
+                        <td class="py-3 px-4 text-right">
+                            <button @click="showForm = !showForm" class="text-blue-600 hover:text-blue-800 font-semibold">
+                                <span x-show="!showForm">Submit Grade</span>
+                                <span x-show="showForm">Cancel</span>
+                            </button>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% if can_encode %}
+                    <tr x-show="showForm" x-transition class="bg-gray-50">
+                        <td colspan="5" class="p-4">
+                            <form method="post" action="{% url 'grades:submit_grade' item.enrollment.id %}" class="max-w-2xl">
+                                {% csrf_token %}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Grade *</label>
+                                        <select name="grade" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            <option value="">Select Grade</option>
+                                            <optgroup label="Passing Grades">
+                                                <option value="1.00" {% if item.grade and item.grade.grade == "1.00" %}selected{% endif %}>1.00</option>
+                                                <option value="1.25" {% if item.grade and item.grade.grade == "1.25" %}selected{% endif %}>1.25</option>
+                                                <option value="1.50" {% if item.grade and item.grade.grade == "1.50" %}selected{% endif %}>1.50</option>
+                                                <option value="1.75" {% if item.grade and item.grade.grade == "1.75" %}selected{% endif %}>1.75</option>
+                                                <option value="2.00" {% if item.grade and item.grade.grade == "2.00" %}selected{% endif %}>2.00</option>
+                                                <option value="2.25" {% if item.grade and item.grade.grade == "2.25" %}selected{% endif %}>2.25</option>
+                                                <option value="2.50" {% if item.grade and item.grade.grade == "2.50" %}selected{% endif %}>2.50</option>
+                                                <option value="2.75" {% if item.grade and item.grade.grade == "2.75" %}selected{% endif %}>2.75</option>
+                                                <option value="3.00" {% if item.grade and item.grade.grade == "3.00" %}selected{% endif %}>3.00</option>
+                                            </optgroup>
+                                            <optgroup label="Conditional">
+                                                <option value="3.25" {% if item.grade and item.grade.grade == "3.25" %}selected{% endif %}>3.25</option>
+                                                <option value="3.50" {% if item.grade and item.grade.grade == "3.50" %}selected{% endif %}>3.50</option>
+                                                <option value="3.75" {% if item.grade and item.grade.grade == "3.75" %}selected{% endif %}>3.75</option>
+                                                <option value="4.00" {% if item.grade and item.grade.grade == "4.00" %}selected{% endif %}>4.00</option>
+                                            </optgroup>
+                                            <optgroup label="Failing">
+                                                <option value="5.00" {% if item.grade and item.grade.grade == "5.00" %}selected{% endif %}>5.00 (Failed)</option>
+                                            </optgroup>
+                                            <optgroup label="Special">
+                                                <option value="INC" {% if item.grade and item.grade.grade == "INC" %}selected{% endif %}>INC (Incomplete)</option>
+                                                <option value="DRP" {% if item.grade and item.grade.grade == "DRP" %}selected{% endif %}>DRP (Dropped)</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Remarks (Optional)</label>
+                                        <input type="text" name="remarks" value="{% if item.grade %}{{ item.grade.remarks }}{% endif %}" placeholder="Optional remarks" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex justify-end">
+                                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-semibold">
+                                        {% if item.has_grade %}Update Grade{% else %}Submit Grade{% endif %}
+                                    </button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="py-12 text-center text-gray-500">
+                            No students enrolled in this section
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="mt-6 bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
+        <p class="text-sm font-semibold text-blue-900 mb-2">Grade Scale:</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-700">
+            <div><strong>1.00 - 3.00:</strong> Passing</div>
+            <div><strong>3.25 - 4.00:</strong> Conditional</div>
+            <div><strong>5.00:</strong> Failed</div>
+            <div><strong>INC:</strong> Incomplete (Major: 6 months, Minor: 1 year)</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}My Sections - Richwell School Portal{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">My Sections</h1>
+        <p class="text-gray-600">Manage grades for your assigned sections</p>
+    </div>
+
+    {% if sections %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for section in sections %}
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-xl font-bold">{{ section.subject.code }}</h3>
+                    {% if section.term.is_active %}
+                    <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full font-semibold">Active</span>
+                    {% else %}
+                    <span class="px-2 py-1 bg-gray-500 text-white text-xs rounded-full font-semibold">Closed</span>
+                    {% endif %}
+                </div>
+                <p class="text-blue-100">{{ section.subject.title }}</p>
+            </div>
+
+            <div class="p-4">
+                <div class="space-y-2 mb-4">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Section: <strong class="ml-1">{{ section.section_code }}</strong>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Term: <strong class="ml-1">{{ section.term.name }}</strong>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        Students: <strong class="ml-1">{{ section.student_count }}</strong>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        Units: <strong class="ml-1">{{ section.subject.units }}</strong>
+                    </div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <a href="{% url 'grades:section_grades' section.id %}" class="block w-full bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700 transition font-semibold">
+                        Manage Grades →
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+        <svg class="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="text-xl font-bold text-gray-700 mb-2">No Sections Assigned</h3>
+        <p class="text-gray-500">You don't have any sections assigned yet. Please contact the registrar.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

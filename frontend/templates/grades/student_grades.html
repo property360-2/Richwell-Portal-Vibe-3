@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}My Grades - Richwell School Portal{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">My Grades</h1>
+        <p class="text-gray-600">View your academic performance</p>
+    </div>
+
+    <!-- Overall Summary Card -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-6 text-white mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                <p class="text-blue-100 text-sm mb-1">Student Name</p>
+                <p class="text-2xl font-bold">{{ student.user.get_full_name }}</p>
+                <p class="text-blue-200 text-sm">{{ student.user.username }}</p>
+            </div>
+            <div>
+                <p class="text-blue-100 text-sm mb-1">Program</p>
+                <p class="text-lg font-semibold">{{ student.program.name }}</p>
+                <p class="text-blue-200 text-sm">{{ student.curriculum.version }}</p>
+            </div>
+            <div>
+                <p class="text-blue-100 text-sm mb-1">Overall GPA</p>
+                <p class="text-4xl font-bold">{% if overall_gpa %}{{ overall_gpa }}{% else %}N/A{% endif %}</p>
+                <p class="text-blue-200 text-sm">{{ total_completed_units }} units completed</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grades by Term -->
+    {% if terms_data %}
+        {% for term_name, data in terms_data.items %}
+        <div class="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
+            <div class="bg-gray-100 border-b border-gray-200 p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">{{ term_name }}</h2>
+                        <p class="text-sm text-gray-600">
+                            {{ data.term.start_date|date:"M d, Y" }} - {{ data.term.end_date|date:"M d, Y" }}
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        {% if data.term_gpa %}
+                        <p class="text-sm text-gray-600">Term GPA</p>
+                        <p class="text-3xl font-bold text-blue-600">{{ data.term_gpa }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ data.completed_units }}/{{ data.total_units }} units</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-200">
+                            <th class="text-left py-3 px-4 text-gray-700 font-semibold text-sm">Subject Code</th>
+                            <th class="text-left py-3 px-4 text-gray-700 font-semibold text-sm">Title</th>
+                            <th class="text-center py-3 px-4 text-gray-700 font-semibold text-sm">Units</th>
+                            <th class="text-center py-3 px-4 text-gray-700 font-semibold text-sm">Section</th>
+                            <th class="text-center py-3 px-4 text-gray-700 font-semibold text-sm">Professor</th>
+                            <th class="text-center py-3 px-4 text-gray-700 font-semibold text-sm">Grade</th>
+                            <th class="text-center py-3 px-4 text-gray-700 font-semibold text-sm">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.enrollments %}
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-4 font-semibold text-blue-600">{{ item.enrollment.subject.code }}</td>
+                            <td class="py-3 px-4">{{ item.enrollment.subject.title }}</td>
+                            <td class="py-3 px-4 text-center">{{ item.enrollment.subject.units }}</td>
+                            <td class="py-3 px-4 text-center text-sm">{{ item.enrollment.section.section_code }}</td>
+                            <td class="py-3 px-4 text-center text-sm">{{ item.enrollment.professor.last_name }}</td>
+                            <td class="py-3 px-4 text-center">
+                                {% if item.grade %}
+                                    <span class="text-xl font-bold
+                                        {% if item.grade.is_passing %}text-green-600
+                                        {% elif item.grade.is_incomplete %}text-yellow-600
+                                        {% else %}text-red-600{% endif %}">
+                                        {{ item.grade.grade }}
+                                    </span>
+                                    {% if item.grade.is_incomplete and item.grade.inc_expiration_date %}
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        Expires: {{ item.grade.inc_expiration_date|date:"M d, Y" }}
+                                        {% if item.grade.is_inc_expired %}
+                                        <span class="text-red-600 font-semibold block">(EXPIRED)</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    {% if item.grade.remarks %}
+                                    <div class="text-xs text-gray-500 mt-1 italic">{{ item.grade.remarks }}</div>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-gray-400 text-sm">Not yet graded</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                {% if item.enrollment.status == 'enrolled' %}
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-semibold">Enrolled</span>
+                                {% elif item.enrollment.status == 'completed' %}
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-semibold">Completed</span>
+                                {% elif item.enrollment.status == 'inc' %}
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full font-semibold">INC</span>
+                                {% elif item.enrollment.status == 'failed' %}
+                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full font-semibold">Failed</span>
+                                {% elif item.enrollment.status == 'repeat_required' %}
+                                <span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full font-semibold">Repeat Required</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+        <svg class="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="text-xl font-bold text-gray-700 mb-2">No Grades Yet</h3>
+        <p class="text-gray-500">You haven't been enrolled in any subjects yet or grades haven't been posted.</p>
+    </div>
+    {% endif %}
+
+    <!-- Grade Legend -->
+    <div class="mt-8 bg-blue-50 border-l-4 border-blue-600 p-6 rounded">
+        <p class="text-sm font-semibold text-blue-900 mb-3">Grade Scale & Status Guide</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+            <div>
+                <p class="font-semibold mb-2">Grade Values:</p>
+                <ul class="space-y-1">
+                    <li><strong>1.00 - 3.00:</strong> Passing</li>
+                    <li><strong>3.25 - 4.00:</strong> Conditional Pass</li>
+                    <li><strong>5.00:</strong> Failed</li>
+                    <li><strong>INC:</strong> Incomplete</li>
+                    <li><strong>DRP:</strong> Dropped</li>
+                </ul>
+            </div>
+            <div>
+                <p class="font-semibold mb-2">INC Deadlines:</p>
+                <ul class="space-y-1">
+                    <li><strong>Major Subjects:</strong> 6 months from INC date</li>
+                    <li><strong>Minor Subjects:</strong> 1 year from INC date</li>
+                    <li>After expiration → Status changes to "Repeat Required"</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
