@@ -170,7 +170,7 @@ class ModelTests(TestCase):
             status='enrolled'
         )
 
-        self.assertEqual(self.section.studentsubject_set.count(), 1)
+        self.assertEqual(self.section.student_enrollments.count(), 1)
 
     def test_grade_is_passing(self):
         """Test grade passing status."""
