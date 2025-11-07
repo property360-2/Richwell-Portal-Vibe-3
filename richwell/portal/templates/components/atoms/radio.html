@@ -25,12 +25,6 @@
        label='Cash' %}
 #}
 
-{% with
-    radio_checked=checked|default:False
-    radio_disabled=disabled|default:False
-    radio_required=required|default:False
-%}
-
 <div class="flex items-start">
     <div class="flex items-center h-5">
         <input
@@ -59,5 +53,3 @@
     </div>
     {% endif %}
 </div>
-
-{% endwith %}

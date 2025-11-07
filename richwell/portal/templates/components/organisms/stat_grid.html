@@ -6,11 +6,7 @@
    - title: Grid title (optional)
 #}
 
-{% with
-   stat_items=stats
-   stat_columns=columns|default:4
-   stat_title=title|default:""
-%}
+{% with stat_items=stats stat_columns=columns|default:4 stat_title=title|default:"" %}
 
 <div>
    {% if stat_title %}

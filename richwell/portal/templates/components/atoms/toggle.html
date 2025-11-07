@@ -25,12 +25,7 @@
        off_label='Off' %}
 #}
 
-{% with
-    toggle_id=id|default:name
-    toggle_checked=checked|default:False
-    toggle_disabled=disabled|default:False
-    toggle_size=size|default:"md"
-%}
+{% with toggle_id=id|default:name toggle_checked=checked|default:False toggle_disabled=disabled|default:False toggle_size=size|default:"md" %}
 
 {# Size configurations #}
 {% if toggle_size == 'sm' %}

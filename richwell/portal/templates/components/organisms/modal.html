@@ -26,18 +26,7 @@
 {% load static %}
 
 {# Set defaults #}
-{% with
-  modal_id=id|default:"modal"
-  modal_title=title|default:""
-  modal_size=size|default:"md"
-  modal_dismissible=dismissible|default:True
-  modal_show_close=show_close|default:True
-  modal_show_footer=show_footer|default:True
-  modal_primary_text=primary_button_text|default:"Confirm"
-  modal_secondary_text=secondary_button_text|default:"Cancel"
-  modal_primary_action=primary_button_action|default:""
-  modal_secondary_action=secondary_button_action|default:""
-%}
+{% with modal_id=id|default:"modal" modal_title=title|default:"" modal_size=size|default:"md" modal_dismissible=dismissible|default:True modal_show_close=show_close|default:True modal_show_footer=show_footer|default:True modal_primary_text=primary_button_text|default:"Confirm" modal_secondary_text=secondary_button_text|default:"Cancel" modal_primary_action=primary_button_action|default:"" modal_secondary_action=secondary_button_action|default:"" %}
 
 <div
   x-data="{

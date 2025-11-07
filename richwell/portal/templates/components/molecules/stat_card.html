@@ -9,14 +9,7 @@
    - color: primary|success|danger|warning (default: primary)
 #}
 
-{% with
-   stat_label=label
-   stat_value=value
-   stat_icon=icon|default:""
-   stat_change=change|default:""
-   stat_change_type=change_type|default:""
-   stat_color=color|default:"primary"
-%}
+{% with stat_label=label stat_value=value stat_icon=icon|default:"" stat_change=change|default:"" stat_change_type=change_type|default:"" stat_color=color|default:"primary" %}
 
 <div class="bg-white rounded-lg shadow p-6">
    <div class="flex items-center justify-between">

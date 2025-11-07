@@ -7,19 +7,10 @@
    - classes: Additional CSS classes (optional)
 #}
 
-{% with
-   label_text=text
-   label_for=for|default:""
-   label_required=required|default:False
-   label_classes=classes|default:""
-%}
-
 <label
-   {% if label_for %}for="{{ label_for }}"{% endif %}
-   class="block text-sm font-medium text-gray-700 mb-1 {{ label_classes }}"
+   {% if for %}for="{{ for }}"{% endif %}
+   class="block text-sm font-medium text-gray-700 mb-1 {{ classes|default:'' }}"
 >
-   {{ label_text }}
-   {% if label_required %}<span class="text-red-500 ml-1">*</span>{% endif %}
+   {{ text }}
+   {% if required %}<span class="text-red-500 ml-1">*</span>{% endif %}
 </label>
-
-{% endwith %}

@@ -23,19 +23,7 @@
 {% load static %}
 
 {# Set defaults #}
-{% with
-  input_id=id|default:name
-  input_value=value|default:""
-  input_placeholder=placeholder|default:"Select date"
-  input_required=required|default:False
-  input_disabled=disabled|default:False
-  input_min=min_date|default:""
-  input_max=max_date|default:""
-  input_error=error|default:""
-  input_help=help_text|default:""
-  show_icon=icon|default:True
-  input_autocomplete=autocomplete|default:""
-%}
+{% with input_id=id|default:name input_value=value|default:"" input_placeholder=placeholder|default:"Select date" input_required=required|default:False input_disabled=disabled|default:False input_min=min_date|default:"" input_max=max_date|default:"" input_error=error|default:"" input_help=help_text|default:"" show_icon=icon|default:True input_autocomplete=autocomplete|default:"" %}
 
 <div class="w-full" x-data="{ focused: false }">
   {# Label #}

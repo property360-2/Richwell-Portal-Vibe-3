@@ -8,13 +8,7 @@
    - hoverable: boolean - highlight on hover (default: True)
 #}
 
-{% with
-   table_headers=headers
-   table_rows=rows
-   table_empty=empty_message|default:"No data available"
-   table_striped=striped|default:False
-   table_hoverable=hoverable|default:True
-%}
+{% with table_headers=headers table_rows=rows table_empty=empty_message|default:"No data available" table_striped=striped|default:False table_hoverable=hoverable|default:True %}
 
 {% if table_rows %}
 <div class="overflow-x-auto">

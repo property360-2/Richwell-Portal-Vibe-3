@@ -27,16 +27,7 @@
 {% load static %}
 
 {# Set defaults #}
-{% with
-  sidebar_id=id|default:"sidebar"
-  sidebar_position=position|default:"left"
-  sidebar_width=width|default:"md"
-  sidebar_backdrop=backdrop|default:True
-  sidebar_close_button=close_button|default:True
-  sidebar_title=title|default:""
-  sidebar_subtitle=subtitle|default:""
-  sidebar_content=content_html|default:""
-%}
+{% with sidebar_id=id|default:"sidebar" sidebar_position=position|default:"left" sidebar_width=width|default:"md" sidebar_backdrop=backdrop|default:True sidebar_close_button=close_button|default:True sidebar_title=title|default:"" sidebar_subtitle=subtitle|default:"" sidebar_content=content_html|default:"" %}
 
 <div
   x-data="{

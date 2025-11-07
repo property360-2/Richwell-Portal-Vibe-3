@@ -7,12 +7,7 @@
    - breadcrumbs: List of {text, href} for breadcrumbs (optional)
 #}
 
-{% with
-   header_title=title
-   header_subtitle=subtitle|default:""
-   header_action=action_button|default:None
-   header_breadcrumbs=breadcrumbs|default:None
-%}
+{% with header_title=title header_subtitle=subtitle|default:"" header_action=action_button|default:None header_breadcrumbs=breadcrumbs|default:None %}
 
 <div class="bg-white rounded-lg shadow p-6 mb-6">
    {% if header_breadcrumbs %}

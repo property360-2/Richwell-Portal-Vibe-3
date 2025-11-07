@@ -8,13 +8,7 @@
    - shadow: boolean (default: True)
 #}
 
-{% with
-   card_title=title|default:""
-   card_subtitle=subtitle|default:""
-   card_classes=classes|default:""
-   card_padding=padding|default:"md"
-   card_shadow=shadow|default:True
-%}
+{% with card_title=title|default:"" card_subtitle=subtitle|default:"" card_classes=classes|default:"" card_padding=padding|default:"md" card_shadow=shadow|default:True %}
 
 {% if card_padding == 'sm' %}
    {% with padding_class="p-4" %}{% include 'components/molecules/card_inner.html' %}{% endwith %}

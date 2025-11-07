@@ -23,14 +23,7 @@
        search=True %}
 #}
 
-{% with
-    table_striped=striped|default:False
-    table_hoverable=hoverable|default:True
-    table_pagination=pagination|default:False
-    table_per_page=per_page|default:10
-    table_search=search|default:False
-    table_empty=empty_message|default:"No data available"
-%}
+{% with table_striped=striped|default:False table_hoverable=hoverable|default:True table_pagination=pagination|default:False table_per_page=per_page|default:10 table_search=search|default:False table_empty=empty_message|default:"No data available" %}
 
 <div class="bg-white shadow-md rounded-lg overflow-hidden"
      x-data="{

@@ -31,14 +31,7 @@
        multi_step=True %}
 #}
 
-{% with
-    form_method=method|default:"POST"
-    form_multi_step=multi_step|default:False
-    form_show_progress=show_progress|default:True
-    form_client_validation=client_validation|default:True
-    form_confirm=confirm_before_submit|default:False
-    form_submit_text=submit_text|default:"Submit"
-%}
+{% with form_method=method|default:"POST" form_multi_step=multi_step|default:False form_show_progress=show_progress|default:True form_client_validation=client_validation|default:True form_confirm=confirm_before_submit|default:False form_submit_text=submit_text|default:"Submit" %}
 
 <div class="bg-white shadow-md rounded-lg overflow-hidden"
      x-data="{
