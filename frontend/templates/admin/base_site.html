@@ -1,0 +1,126 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}Richwell School Portal{% endblock %}
+
+{% block branding %}
+<div style="padding: 10px 20px; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);">
+    <h1 id="site-name">
+        <a href="{% url 'admin:index' %}" style="color: #ffffff; text-decoration: none; font-size: 24px; font-weight: bold;">
+            🎓 Richwell School Portal
+        </a>
+    </h1>
+    <p style="color: #bfdbfe; margin-top: 5px; font-size: 14px;">
+        Administration Panel
+    </p>
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Custom Admin Styling */
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --secondary: #3b82f6;
+        --accent: #60a5fa;
+    }
+
+    /* Header customization */
+    #header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Links */
+    a:link, a:visited {
+        color: var(--primary);
+    }
+
+    a:focus, a:hover {
+        color: var(--primary-dark);
+    }
+
+    /* Buttons */
+    .button, input[type=submit], input[type=button], .submit-row input, button {
+        background: var(--primary);
+        border: none;
+        border-radius: 6px;
+        padding: 10px 15px;
+        transition: all 0.3s ease;
+    }
+
+    .button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, button:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Module headers */
+    .module h2, .module caption, .inline-group h2 {
+        background: var(--primary);
+        border-radius: 6px 6px 0 0;
+    }
+
+    /* Breadcrumbs */
+    div.breadcrumbs {
+        background: #f3f4f6;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin: 15px 0;
+    }
+
+    /* Tables */
+    table {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    thead th {
+        background: var(--primary);
+        color: white;
+    }
+
+    tbody tr:hover {
+        background: #eff6ff;
+    }
+
+    /* Dashboard modules */
+    .module {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    /* Changelis */
+    #changelist {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    /* Messages */
+    .messagelist li {
+        border-radius: 6px;
+        padding: 12px 15px;
+        margin-bottom: 10px;
+    }
+
+    .messagelist li.success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .messagelist li.error {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .messagelist li.warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+</style>
+{% endblock %}
