@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Section Utilization Report{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <a href="{% url 'reports:dashboard' %}" class="text-blue-600 hover:text-blue-800 font-semibold mb-4 inline-block">← Back</a>
+    <h1 class="text-3xl font-bold mb-6">Section Utilization Report</h1>
+    
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <form method="get" class="flex gap-4"><select name="term" class="flex-1 px-3 py-2 border rounded-lg"><option value="">All Terms</option>{% for term in terms %}<option value="{{ term.id }}" {% if term.id == selected_term %}selected{% endif %}>{{ term.name }}</option>{% endfor %}</select><button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Filter</button></form>
+    </div>
+
+    <div class="grid grid-cols-4 gap-6 mb-6">
+        <div class="bg-blue-50 p-6 rounded-xl"><p class="text-sm text-gray-600">Total Sections</p><p class="text-4xl font-bold text-blue-600">{{ total_sections }}</p></div>
+        <div class="bg-green-50 p-6 rounded-xl"><p class="text-sm text-gray-600">Full Sections</p><p class="text-4xl font-bold text-green-600">{{ full_sections }}</p></div>
+        <div class="bg-purple-50 p-6 rounded-xl"><p class="text-sm text-gray-600">Total Capacity</p><p class="text-4xl font-bold text-purple-600">{{ total_capacity }}</p></div>
+        <div class="bg-indigo-50 p-6 rounded-xl"><p class="text-sm text-gray-600">Utilization</p><p class="text-4xl font-bold text-indigo-600">{{ overall_utilization }}%</p></div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <table class="w-full">
+            <thead><tr class="bg-gray-50"><th class="text-left py-3 px-4">Section</th><th class="text-left py-3 px-4">Term</th><th class="text-center py-3 px-4">Enrolled</th><th class="text-center py-3 px-4">Capacity</th><th class="text-center py-3 px-4">Available</th><th class="text-center py-3 px-4">Utilization</th></tr></thead>
+            <tbody>
+                {% for data in section_data %}
+                <tr class="border-b hover:bg-gray-50"><td class="py-3 px-4 font-semibold">{{ data.section.subject.code }} - {{ data.section.section_code }}</td><td class="py-3 px-4 text-sm">{{ data.section.term.name }}</td><td class="py-3 px-4 text-center font-bold">{{ data.enrolled }}</td><td class="py-3 px-4 text-center">{{ data.capacity }}</td><td class="py-3 px-4 text-center">{{ data.available }}</td><td class="py-3 px-4 text-center"><span class="px-3 py-1 rounded-full font-semibold {% if data.utilization >= 90 %}bg-red-100 text-red-800{% elif data.utilization >= 70 %}bg-yellow-100 text-yellow-800{% else %}bg-green-100 text-green-800{% endif %}">{{ data.utilization }}%</span></td></tr>
+                {% empty %}
+                <tr><td colspan="6" class="py-12 text-center text-gray-500">No data found</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

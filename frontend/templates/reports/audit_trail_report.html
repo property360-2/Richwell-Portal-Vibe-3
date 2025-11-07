@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Audit Trail Report{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <a href="{% url 'reports:dashboard' %}" class="text-blue-600 hover:text-blue-800 font-semibold mb-4 inline-block">← Back</a>
+    <h1 class="text-3xl font-bold mb-6">Audit Trail & System Activity</h1>
+    
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <form method="get" class="grid grid-cols-3 gap-4"><select name="action" class="px-3 py-2 border rounded-lg"><option value="">All Actions</option>{% for action in action_types %}<option value="{{ action }}" {% if action == selected_action %}selected{% endif %}>{{ action|title }}</option>{% endfor %}</select><select name="days" class="px-3 py-2 border rounded-lg"><option value="7" {% if selected_days == "7" %}selected{% endif %}>Last 7 days</option><option value="30" {% if selected_days == "30" %}selected{% endif %}>Last 30 days</option><option value="90" {% if selected_days == "90" %}selected{% endif %}>Last 90 days</option></select><button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Filter</button></form>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-xl shadow-lg p-6"><h2 class="text-lg font-bold mb-4">Activity Summary</h2><div class="space-y-2">{% for item in activity_summary %}<div class="flex justify-between p-2 bg-gray-50 rounded"><span class="font-semibold">{{ item.action|title }}</span><span class="text-blue-600 font-bold">{{ item.count }}</span></div>{% endfor %}</div></div>
+        <div class="bg-white rounded-xl shadow-lg p-6"><h2 class="text-lg font-bold mb-4">Recent Activity (Last 100)</h2><div class="space-y-1 max-h-96 overflow-y-auto">{% for entry in audit_entries %}<div class="text-sm p-2 border-l-2 {% if entry.action == 'create_grade' or entry.action == 'update_grade' %}border-green-500{% elif entry.action == 'update_setting' %}border-yellow-500{% else %}border-blue-500{% endif %} bg-gray-50"><p class="font-semibold">{{ entry.action|title }}</p><p class="text-gray-600 text-xs">{{ entry.actor.get_full_name }} - {{ entry.created_at|date:"M d, Y H:i" }}</p></div>{% endfor %}</div></div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <table class="w-full text-sm">
+            <thead><tr class="bg-gray-50"><th class="text-left py-2 px-3">Time</th><th class="text-left py-2 px-3">User</th><th class="text-left py-2 px-3">Action</th><th class="text-left py-2 px-3">Entity</th><th class="text-left py-2 px-3">Notes</th></tr></thead>
+            <tbody>
+                {% for entry in audit_entries %}
+                <tr class="border-b"><td class="py-2 px-3">{{ entry.created_at|date:"M d, H:i" }}</td><td class="py-2 px-3">{{ entry.actor.username }}</td><td class="py-2 px-3 font-semibold">{{ entry.action }}</td><td class="py-2 px-3">{{ entry.entity }}</td><td class="py-2 px-3 text-xs text-gray-600">{{ entry.notes|truncatewords:10 }}</td></tr>
+                {% empty %}
+                <tr><td colspan="5" class="py-12 text-center text-gray-500">No audit entries found</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
