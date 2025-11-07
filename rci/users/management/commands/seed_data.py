@@ -722,18 +722,19 @@ class Command(BaseCommand):
         self.stdout.write('\n📋 Creating Sample Audit Trail Entries...')
 
         audit_entries = [
-            ('create_grade', 'Grade', 'Professor submitted grade for CS101'),
-            ('update_grade', 'Grade', 'Grade updated from INC to 2.00'),
-            ('create_enrollment', 'StudentSubject', 'Student enrolled in CS201'),
-            ('update_setting', 'Setting', 'Changed freshman_unit_cap to 30'),
+            ('created', 'Grade', 1, 'Professor submitted grade for CS101'),
+            ('updated', 'Grade', 1, 'Grade updated from INC to 2.00'),
+            ('created', 'StudentSubject', 1, 'Student enrolled in CS201'),
+            ('updated', 'Setting', 1, 'Changed freshman_unit_cap to 30'),
         ]
 
-        for action, entity, notes in audit_entries:
+        for action, entity, entity_id, description in audit_entries:
             AuditTrail.objects.create(
                 actor=admin_user,
                 action=action,
                 entity=entity,
-                notes=notes
+                entity_id=entity_id,
+                new_value_json={'description': description}
             )
 
         self.stdout.write(self.style.SUCCESS(f'  ✓ Created {AuditTrail.objects.count()} audit entries'))
