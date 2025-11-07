@@ -282,10 +282,17 @@ class GradeService:
         for enrollment in completed:
             try:
                 grade = Grade.objects.get(student_subject=enrollment)
-                if grade.grade in ['P', 'INC', 'DRP']:
+
+                # Try numeric_grade first, then fall back to grade field
+                if grade.numeric_grade is not None:
+                    grade_value = Decimal(str(grade.numeric_grade))
+                elif grade.grade:
+                    if grade.grade in ['P', 'INC', 'DRP']:
+                        continue
+                    grade_value = Decimal(grade.grade)
+                else:
                     continue
 
-                grade_value = Decimal(grade.grade)
                 total_grade_points += grade_value * enrollment.subject.units
                 total_units += enrollment.subject.units
             except (Grade.DoesNotExist, ValueError, TypeError):

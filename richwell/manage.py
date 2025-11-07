@@ -8,7 +8,7 @@ def main():
     """Run administrative tasks."""
     # Increase recursion limit for tests with complex template nesting
     if 'test' in sys.argv:
-        sys.setrecursionlimit(20000)
+        sys.setrecursionlimit(50000)
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "richwell.settings")
     try:

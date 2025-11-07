@@ -1,26 +1,22 @@
-{# Organism: Footer Component
+{# Organism: Footer Component (Simplified)
    Usage: {% include 'components/organisms/footer.html' %}
    Props:
    - copyright_text: Copyright text (default: auto-generated)
    - links: List of footer links {text, href} (optional)
 #}
 
-{% with footer_copyright=copyright_text|default:"© 2025 Richwell School Portal. All rights reserved." footer_links=links|default:None %}
-
 <footer class="bg-white mt-12 py-6 border-t">
    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {% if footer_links %}
+      {% if links %}
       <div class="flex justify-center space-x-6 mb-4">
-         {% for link in footer_links %}
+         {% for link in links %}
          <a href="{{ link.href }}" class="text-gray-600 hover:text-blue-600 text-sm">{{ link.text }}</a>
          {% endfor %}
       </div>
       {% endif %}
 
       <div class="text-center text-gray-600 text-sm">
-         <p>{{ footer_copyright }}</p>
+         <p>{{ copyright_text|default:"© 2025 Richwell School Portal. All rights reserved." }}</p>
       </div>
    </div>
 </footer>
-
-{% endwith %}

@@ -220,6 +220,26 @@ class ViewTests(TestCase):
             role='professor'
         )
 
+        # Create program and curriculum for student
+        self.program = Program.objects.create(
+            code='BSCS',
+            name='Computer Science',
+            level='Bachelor'
+        )
+        self.curriculum = Curriculum.objects.create(
+            program=self.program,
+            version='2024',
+            effective_sy='AY 2024-2025'
+        )
+
+        # Create Student object for student_user
+        self.student = Student.objects.create(
+            user=self.student_user,
+            program=self.program,
+            curriculum=self.curriculum,
+            status='active'
+        )
+
     def test_login_view_get(self):
         """Test login page loads."""
         response = self.client.get(reverse('login'))
@@ -327,7 +347,7 @@ class FormTests(TestCase):
 
         form = EnrollmentForm(data={
             'section': self.section.id
-        })
+        }, student=self.student, term=self.term)
 
         # Form should be valid with proper data
         self.assertTrue(form.is_valid())
@@ -374,12 +394,14 @@ class IntegrationTests(TestCase):
             curriculum=self.curriculum
         )
 
-        # Create term and courses
+        # Create term and courses (use dates in the future)
+        from datetime import timedelta
+        today = date.today()
         self.term = Term.objects.create(
             name='1st Semester 2024-2025',
-            start_date=date(2024, 8, 1),
-            end_date=date(2024, 12, 15),
-            add_drop_deadline=date(2024, 8, 15),
+            start_date=today,
+            end_date=today + timedelta(days=120),
+            add_drop_deadline=today + timedelta(days=15),
             is_active=True
         )
 
