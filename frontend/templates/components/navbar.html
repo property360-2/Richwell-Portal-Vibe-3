@@ -50,7 +50,7 @@
                     </div>
                 {% else %}
                     <a href="{% url 'login' %}" class="text-white hover:text-blue-200 transition">Login</a>
-                    <a href="#" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition">Apply Now</a>
+                    <a href="{% url 'admission:apply' %}" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition">Apply Now</a>
                 {% endif %}
             </div>
 
@@ -83,7 +83,7 @@
                 <a href="{% url 'logout' %}" class="block py-2 text-red-300 hover:text-red-100">Logout</a>
             {% else %}
                 <a href="{% url 'login' %}" class="block py-2 text-white hover:text-blue-200">Login</a>
-                <a href="#" class="block py-2 text-white hover:text-blue-200">Apply Now</a>
+                <a href="{% url 'admission:apply' %}" class="block py-2 text-white hover:text-blue-200">Apply Now</a>
             {% endif %}
         </div>
     </div>

@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "grades",
     "audit",
     "settingsapp",
+    "admission",
 ]
 
 MIDDLEWARE = [

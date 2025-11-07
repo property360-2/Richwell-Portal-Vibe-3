@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admission Application - Richwell School Portal</title>
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js via CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <a href="{% url 'home' %}" class="inline-block mb-4">
+                <h1 class="text-4xl font-bold text-blue-600">🎓 Richwell Portal</h1>
+            </a>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Admission Application</h2>
+            <p class="text-gray-600">Start your journey with us today!</p>
+        </div>
+
+        <!-- Application Form -->
+        <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+                <h3 class="text-2xl font-bold">Application Form</h3>
+                <p class="text-blue-100 mt-1">Please fill out all required fields</p>
+            </div>
+
+            <div class="p-8">
+                <!-- Flash Messages -->
+                {% if messages %}
+                <div class="mb-6">
+                    {% for message in messages %}
+                    <div class="p-4 mb-2 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% elif message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="post" x-data="{ applicantType: 'freshman' }">
+                    {% csrf_token %}
+
+                    <!-- Personal Information Section -->
+                    <div class="mb-8">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-600">
+                            Personal Information
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">First Name *</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.first_name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Middle Name</label>
+                                {{ form.middle_name }}
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Last Name *</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.last_name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Email Address *</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Phone Number *</label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.phone.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Birth Date *</label>
+                                {{ form.birth_date }}
+                                {% if form.birth_date.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.birth_date.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Complete Address *</label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.address.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Application Details Section -->
+                    <div class="mb-8">
+                        <h4 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-600">
+                            Application Details
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Applicant Type *</label>
+                                <select
+                                    name="{{ form.applicant_type.html_name }}"
+                                    x-model="applicantType"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="freshman">Freshman</option>
+                                    <option value="transferee">Transferee</option>
+                                </select>
+                                {% if form.applicant_type.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.applicant_type.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Program *</label>
+                                {{ form.program }}
+                                {% if form.program.errors %}
+                                <p class="text-red-600 text-sm mt-1">{{ form.program.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Transferee Fields (conditionally shown) -->
+                        <div x-show="applicantType === 'transferee'" x-transition class="mt-4">
+                            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
+                                <p class="text-yellow-800 font-semibold">Transferee Information</p>
+                                <p class="text-yellow-700 text-sm">Please provide your previous school details</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Previous School *</label>
+                                    {{ form.previous_school }}
+                                    {% if form.previous_school.errors %}
+                                    <p class="text-red-600 text-sm mt-1">{{ form.previous_school.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Credits/Units Earned *</label>
+                                    {{ form.credits_earned }}
+                                    {% if form.credits_earned.errors %}
+                                    <p class="text-red-600 text-sm mt-1">{{ form.credits_earned.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-between items-center">
+                        <a href="{% url 'home' %}" class="text-gray-600 hover:text-gray-800">
+                            ← Back to Home
+                        </a>
+                        <button
+                            type="submit"
+                            class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-8 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition duration-200 shadow-lg">
+                            Submit Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 text-gray-600 text-sm">
+            &copy; {% now "Y" %} Richwell School Portal. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>
