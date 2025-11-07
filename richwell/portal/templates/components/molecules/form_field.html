@@ -1,19 +1,3 @@
-{# Molecule: Form Field Component
-   Usage: Include this template with label='Email' name='email' type='email' required=True
-   Props:
-   - label: Field label (required)
-   - name: Field name (required)
-   - type: text|email|password|number|date|tel|select|textarea (default: text)
-   - placeholder: Placeholder text (optional)
-   - value: Field value (optional)
-   - required: boolean (optional)
-   - disabled: boolean (optional)
-   - error: Error message (optional)
-   - help_text: Help text below field (optional)
-   - options: For select type - list of {value, label} (optional)
-   - rows: For textarea type - number of rows (optional)
-#}
-
 <div class="mb-4">
    {% include 'components/atoms/label.html' with text=label for_id=name required=required %}
 
