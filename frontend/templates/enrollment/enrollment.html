@@ -35,9 +35,17 @@
                 <p class="text-blue-100 text-sm">Add/Drop Deadline</p>
                 <p class="text-lg font-semibold">{{ active_term.add_drop_deadline|date:"F d, Y" }}</p>
             </div>
-            <a href="{% url 'enrollment:cor' %}" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
-                View COR
-            </a>
+            <div class="flex gap-3">
+                <form method="post" action="{% url 'enrollment:auto_enroll' %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition shadow-lg">
+                        ✨ Auto-Enroll Recommended
+                    </button>
+                </form>
+                <a href="{% url 'enrollment:cor' %}" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
+                    View COR
+                </a>
+            </div>
         </div>
     </div>
 
