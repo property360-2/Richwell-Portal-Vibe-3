@@ -16,10 +16,10 @@
 
                     {% if user.role == 'student' %}
                         <a href="{% url 'enrollment:home' %}" class="text-white hover:text-blue-200 transition">My Enrollment</a>
-                        <a href="#" class="text-white hover:text-blue-200 transition">My Grades</a>
+                        <a href="{% url 'grades:student_grades' %}" class="text-white hover:text-blue-200 transition">My Grades</a>
                     {% elif user.role == 'professor' %}
-                        <a href="#" class="text-white hover:text-blue-200 transition">My Classes</a>
-                        <a href="#" class="text-white hover:text-blue-200 transition">Grade Submission</a>
+                        <a href="{% url 'grades:professor_sections' %}" class="text-white hover:text-blue-200 transition">My Classes</a>
+                        <a href="{% url 'grades:professor_sections' %}" class="text-white hover:text-blue-200 transition">Grade Submission</a>
                     {% elif user.role == 'registrar' or user.role == 'dean' or user.role == 'admin' %}
                         <a href="#" class="text-white hover:text-blue-200 transition">Students</a>
                         <a href="#" class="text-white hover:text-blue-200 transition">Enrollment</a>
@@ -70,10 +70,10 @@
                 <a href="/" class="block py-2 text-white hover:text-blue-200">Dashboard</a>
                 {% if user.role == 'student' %}
                     <a href="{% url 'enrollment:home' %}" class="block py-2 text-white hover:text-blue-200">My Enrollment</a>
-                    <a href="#" class="block py-2 text-white hover:text-blue-200">My Grades</a>
+                    <a href="{% url 'grades:student_grades' %}" class="block py-2 text-white hover:text-blue-200">My Grades</a>
                 {% elif user.role == 'professor' %}
-                    <a href="#" class="block py-2 text-white hover:text-blue-200">My Classes</a>
-                    <a href="#" class="block py-2 text-white hover:text-blue-200">Grade Submission</a>
+                    <a href="{% url 'grades:professor_sections' %}" class="block py-2 text-white hover:text-blue-200">My Classes</a>
+                    <a href="{% url 'grades:professor_sections' %}" class="block py-2 text-white hover:text-blue-200">Grade Submission</a>
                 {% endif %}
                 <hr class="my-2 border-blue-500">
                 <a href="{% url 'profile' %}" class="block py-2 text-white hover:text-blue-200">Profile</a>
