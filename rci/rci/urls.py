@@ -1,11 +1,15 @@
 # rci/rci/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
+from users import views as user_views
 from . import admin as admin_config  # Import admin configuration
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", TemplateView.as_view(template_name="dashboard.html"), name="home"),
+    path("", user_views.dashboard_view, name="home"),
+    path("dashboard/", user_views.dashboard_view, name="dashboard"),
+    path("login/", user_views.login_view, name="login"),
+    path("logout/", user_views.logout_view, name="logout"),
+    path("profile/", user_views.profile_view, name="profile"),
     path("users/", include("users.urls")),
 ]
