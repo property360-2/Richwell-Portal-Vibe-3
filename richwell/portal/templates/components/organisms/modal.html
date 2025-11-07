@@ -14,12 +14,12 @@
   - content_html: HTML content for modal body (can use slot instead)
 
   Usage:
-  {% include "components/organisms/modal.html" with id="deleteModal" title="Confirm Delete" content_html=content %}
+  Include this template with id="deleteModal" title="Confirm Delete" content_html=content
 
   Or with Alpine.js:
   <div x-data="{ showModal: false }">
     <button @click="showModal = true">Open Modal</button>
-    {% include "components/organisms/modal.html" with id="myModal" title="My Modal" %}
+    Include this template with id="myModal" title="My Modal"
   </div>
 #}
 

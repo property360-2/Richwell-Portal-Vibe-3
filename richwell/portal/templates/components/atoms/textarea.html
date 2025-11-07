@@ -1,5 +1,5 @@
 {# Atom: Textarea Component
-   Usage: {% include 'components/atoms/textarea.html' with name='description' placeholder='Enter description' %}
+   Usage: Include this template with name='description' placeholder='Enter description'
    Props:
    - name: Textarea name attribute (required)
    - placeholder: Placeholder text (optional)
@@ -12,11 +12,11 @@
 #}
 
 <textarea
-   id="{{ textarea_id }}"
+   id="{{ id|default:name }}"
    name="{{ name }}"
-   rows="{{ textarea_rows }}"
-   {% if textarea_placeholder %}placeholder="{{ textarea_placeholder }}"{% endif %}
-   {% if textarea_required %}required{% endif %}
-   {% if textarea_disabled %}disabled{% endif %}
-   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition {{ textarea_classes }} {% if textarea_disabled %}bg-gray-100 cursor-not-allowed{% endif %}"
->{% if textarea_value %}{{ textarea_value }}{% endif %}</textarea>
+   rows="{{ rows|default:'4' }}"
+   {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+   {% if required %}required{% endif %}
+   {% if disabled %}disabled{% endif %}
+   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition {{ classes|default:'' }} {% if disabled %}bg-gray-100 cursor-not-allowed{% endif %}"
+>{% if value %}{{ value }}{% endif %}</textarea>

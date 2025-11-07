@@ -12,17 +12,17 @@
    - off_label: Text to show when toggle is OFF (optional)
 
    Usage:
-   {% include 'components/atoms/toggle.html'
+   Include this template
        with name='notifications'
        label='Enable Notifications'
-       checked=True %}
+       checked=True
 
-   {% include 'components/atoms/toggle.html'
+   Include this template
        with name='dark_mode'
        label='Dark Mode'
        size='lg'
        on_label='On'
-       off_label='Off' %}
+       off_label='Off'
 #}
 
 {% with toggle_id=id|default:name toggle_checked=checked|default:False toggle_disabled=disabled|default:False toggle_size=size|default:"md" %}

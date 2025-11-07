@@ -1,14 +1,14 @@
 {# Atom: Label Component
-   Usage: {% include 'components/atoms/label.html' with text='Email Address' for='email' %}
+   Usage: Include this template with text='Email Address' for_id='email'
    Props:
    - text: Label text (required)
-   - for: Input ID this label is for (optional)
+   - for_id: Input ID this label is for (optional)
    - required: boolean - shows asterisk (optional)
    - classes: Additional CSS classes (optional)
 #}
 
 <label
-   {% if for %}for="{{ for }}"{% endif %}
+   {% if for_id %}for="{{ for_id }}"{% endif %}
    class="block text-sm font-medium text-gray-700 mb-1 {{ classes|default:'' }}"
 >
    {{ text }}

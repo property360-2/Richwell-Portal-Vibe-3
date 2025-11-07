@@ -15,12 +15,12 @@
    - search: Enable search functionality (boolean, defaults to False)
 
    Usage:
-   {% include 'components/organisms/sortable_table.html'
+   Include this template
        with headers=table_headers
        rows=table_data
        title='Student Roster'
        striped=True
-       search=True %}
+       search=True
 #}
 
 {% with table_striped=striped|default:False table_hoverable=hoverable|default:True table_pagination=pagination|default:False table_per_page=per_page|default:10 table_search=search|default:False table_empty=empty_message|default:"No data available" %}

@@ -11,12 +11,12 @@
   - content_html: HTML content for sidebar body (optional)
 
   Usage:
-  {% include "components/organisms/sidebar.html" with id="navSidebar" title="Navigation" %}
+  Include this template with id="navSidebar" title="Navigation"
 
   Or with Alpine.js:
   <div x-data="{ showSidebar: false }">
     <button @click="showSidebar = true">Open Sidebar</button>
-    {% include "components/organisms/sidebar.html" with id="mySidebar" position="left" %}
+    Include this template with id="mySidebar" position="left"
   </div>
 
   Trigger from anywhere:

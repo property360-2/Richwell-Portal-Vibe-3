@@ -16,19 +16,17 @@
     Available: bold, italic, underline, strikethrough, h1, h2, h3, ul, ol, link, image, code
 
   Usage:
-  {% include "components/molecules/rich_text_editor.html" with
+  Include this template with
     label="Description"
     name="description"
     required=True
-  %}
 
   Advanced usage with custom toolbar:
-  {% include "components/molecules/rich_text_editor.html" with
+  Include this template with
     label="Content"
     name="content"
     toolbar_items="bold,italic,link,ul,ol"
     min_height="lg"
-  %}
 #}
 
 {% load static %}

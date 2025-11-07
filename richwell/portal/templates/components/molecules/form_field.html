@@ -1,5 +1,5 @@
 {# Molecule: Form Field Component
-   Usage: {% include 'components/molecules/form_field.html' with label='Email' name='email' type='email' required=True %}
+   Usage: Include this template with label='Email' name='email' type='email' required=True
    Props:
    - label: Field label (required)
    - name: Field name (required)
@@ -15,7 +15,7 @@
 #}
 
 <div class="mb-4">
-   {% include 'components/atoms/label.html' with text=label for=name required=required %}
+   {% include 'components/atoms/label.html' with text=label for_id=name required=required %}
 
    {% if type == 'select' and options %}
       {% include 'components/atoms/select.html' with name=name options=options selected=value required=required disabled=disabled %}

@@ -24,11 +24,11 @@
    - confirm_before_submit: Show confirmation dialog (boolean, defaults to False)
 
    Usage:
-   {% include 'components/organisms/advanced_form.html'
+   Include this template
        with action='/submit/'
        title='Registration Form'
        sections=form_sections
-       multi_step=True %}
+       multi_step=True
 #}
 
 {% with form_method=method|default:"POST" form_multi_step=multi_step|default:False form_show_progress=show_progress|default:True form_client_validation=client_validation|default:True form_confirm=confirm_before_submit|default:False form_submit_text=submit_text|default:"Submit" %}

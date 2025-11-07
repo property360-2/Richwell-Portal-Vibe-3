@@ -1,5 +1,5 @@
 {# Atom: Select Component
-   Usage: {% include 'components/atoms/select.html' with name='role' options=role_options %}
+   Usage: Include this template with name='role' options=role_options
    Props:
    - name: Select name attribute (required)
    - options: List of options (required) - each option should have 'value' and 'label'
@@ -11,14 +11,14 @@
 #}
 
 <select
-   id="{{ select_id }}"
+   id="{{ id|default:name }}"
    name="{{ name }}"
-   {% if select_required %}required{% endif %}
-   {% if select_disabled %}disabled{% endif %}
-   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition {{ select_classes }} {% if select_disabled %}bg-gray-100 cursor-not-allowed{% endif %}"
+   {% if required %}required{% endif %}
+   {% if disabled %}disabled{% endif %}
+   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition {{ classes|default:'' }} {% if disabled %}bg-gray-100 cursor-not-allowed{% endif %}"
 >
-   {% for option in select_options %}
-   <option value="{{ option.value }}" {% if option.value == select_selected %}selected{% endif %}>
+   {% for option in options %}
+   <option value="{{ option.value }}" {% if option.value == selected %}selected{% endif %}>
       {{ option.label }}
    </option>
    {% endfor %}
