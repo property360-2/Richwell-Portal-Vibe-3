@@ -547,7 +547,7 @@ class Command(BaseCommand):
                 subject=ss.subject,
                 defaults={
                     'grade': grade_value,
-                    'posted_by': prof1,
+                    'professor': prof1,
                     'remarks': 'Completed'
                 }
             )
@@ -570,7 +570,7 @@ class Command(BaseCommand):
             defaults={
                 'grade': 'INC',
                 'inc_posted_date': inc_major_date,
-                'posted_by': prof1,
+                'professor': prof1,
                 'remarks': 'Missing final project - EXPIRED'
             }
         )
@@ -593,7 +593,7 @@ class Command(BaseCommand):
             defaults={
                 'grade': 'INC',
                 'inc_posted_date': inc_minor_date,
-                'posted_by': prof2,
+                'professor': prof2,
                 'remarks': 'Incomplete requirements - still active'
             }
         )
@@ -614,7 +614,7 @@ class Command(BaseCommand):
             subject=cs103,
             defaults={
                 'grade': '2.25',
-                'posted_by': prof1,
+                'professor': prof1,
                 'remarks': 'Completed'
             }
         )
@@ -651,7 +651,7 @@ class Command(BaseCommand):
                 subject=subject_obj,
                 defaults={
                     'grade': grade_value,
-                    'posted_by': prof1,
+                    'professor': prof1,
                     'remarks': 'Completed successfully'
                 }
             )
@@ -688,7 +688,7 @@ class Command(BaseCommand):
                 subject=subject_obj,
                 defaults={
                     'grade': grade_value,
-                    'posted_by': prof1,
+                    'professor': prof1,
                     'remarks': 'Failed - needs to repeat' if status == 'failed' else 'Completed'
                 }
             )
