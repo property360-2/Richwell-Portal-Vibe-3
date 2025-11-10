@@ -97,21 +97,6 @@ The system supports the following user roles:
 - **Admission**: Process new student applications
 - **Admin**: Full system access and configuration
 
-## 📖 Development Phases
-
-The project follows a structured development plan:
-- **Phase 0**: Foundations ✅ (Current)
-- **Phase 1**: Core Models & Database Integration
-- **Phase 2**: Authentication & Role Management
-- **Phase 3**: Admissions & Student Onboarding
-- **Phase 4**: Enrollment Module
-- **Phase 5**: Professors & Grading System
-- **Phase 6**: Archiving, AuditTrail & Settings
-- **Phase 7**: Reporting & Analytics
-- **Phase 8**: Final QA & Deployment
-
-See `documentation/phase.md` for detailed phase descriptions.
-
 ## 🔒 Security Notes
 
 - Never commit `.env` file to version control
