@@ -109,8 +109,8 @@ def sections_list_view(request):
         return redirect('dashboard')
 
     sections = Section.objects.select_related('subject', 'term', 'professor').annotate(
-        enrolled_count=Count('enrollments')
-    ).all()
+    enrolled_count=Count('student_subjects')
+  ).all()
 
     # Filter by term
     term_filter = request.GET.get('term', '')
@@ -169,7 +169,7 @@ def terms_list_view(request):
 
     terms = Term.objects.annotate(
         sections_count=Count('sections'),
-        enrollments_count=Count('sections__enrollments')
+       enrollments_count=Count('sections__student_subjects'),
     ).order_by('-start_date')
 
     context = {

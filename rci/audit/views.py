@@ -199,11 +199,11 @@ def archive_student_view(request, student_id):
                     archived_by=request.user
                 )
                 
-                # Update student status to graduated
+                # Update student status
                 student.status = 'graduated'
                 student.save()
                 
-                # Log in audit trail
+                # Log audit
                 AuditTrail.objects.create(
                     actor=request.user,
                     action='graduate_student',
@@ -242,25 +242,20 @@ def view_archives_view(request):
         messages.error(request, 'You do not have permission to view archives.')
         return redirect('dashboard')
     
-    # Get filter parameters
     entity_filter = request.GET.get('entity', '')
     search = request.GET.get('search', '')
     
-    # Base query
     archives = Archive.objects.select_related('archived_by').order_by('-archived_at')
     
-    # Apply filters
     if entity_filter:
         archives = archives.filter(entity=entity_filter)
     
     if search:
         archives = archives.filter(reason__icontains=search)
     
-    # Get distinct entity types for filter
     entity_types = Archive.objects.values_list('entity', flat=True).distinct()
     
-    # Pagination (limit to 50 per page)
-    archives = archives[:50]
+    archives = archives[:50]  # limit
     
     context = {
         'archives': archives,
@@ -280,7 +275,6 @@ def archive_detail_view(request, archive_id):
     
     archive = get_object_or_404(Archive, id=archive_id)
     
-    # Pretty print JSON for display
     snapshot_json = json.dumps(archive.data_snapshot, indent=2)
     
     context = {
@@ -310,3 +304,19 @@ def restore_archive_view(request, archive_id):
         'archive': archive,
     }
     return render(request, 'audit/archive_restore.html', context)
+
+
+# ✅ NEW VIEW — Simple placeholder for Archives List
+@login_required
+def archives_list_view(request):
+    """Simple list view for Archives page"""
+    if not check_archive_access(request.user):
+        messages.error(request, 'You do not have permission to view archives.')
+        return redirect('dashboard')
+
+    archives = Archive.objects.all().order_by('-archived_at')
+
+    context = {
+        'archives': archives
+    }
+    return render(request, 'audit/archives_list.html', context)
